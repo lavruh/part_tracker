@@ -30,7 +30,7 @@ class Part {
   factory Part.fromMap(Map<String, dynamic> map) {
     return Part(
       partNo: UniqueId(id: map['partNo']),
-      runningHours: int.tryParse(map['runningHours']) ?? 0,
+      runningHours: map['runningHours'] ?? 0,
       remarks: map['remarks'] as String,
       type: PartType.fromMap(map['type']),
     );
