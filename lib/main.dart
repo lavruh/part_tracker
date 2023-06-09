@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:part_tracker/parts/ui/screens/part_tracker_overview_screen.dart';
+import 'package:get/get.dart';
+import 'package:part_tracker/di.dart';
+import 'package:part_tracker/locations/ui/screens/locations_overview_screen.dart';
 
 void main() {
+  initDependencies();
   runApp(const MyApp());
 }
 
@@ -10,11 +13,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const PartTrackerOverviewScreen(),
+      home: const LocationsOverviewScreen(),
     );
   }
 }

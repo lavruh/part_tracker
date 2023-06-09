@@ -17,6 +17,11 @@ class Location {
     this.runningHours,
   });
 
+  @override
+  String toString() {
+    return 'Location{id: $id, name: $name, parentLocation: $parentLocation}';
+  }
+
   Location.empty({required this.name})
       : id = UniqueId(),
         allowedPartTypes = [],
@@ -51,7 +56,7 @@ class Location {
       'id': id.toMap(),
       'name': name,
       'allowedPartTypes': allowedPartTypes.map((e) => e.toMap()).toList(),
-      'parentLocation': parentLocation.toString(),
+      'parentLocation': parentLocation?.toMap(),
       'parts': parts.map((e) => e.toMap()).toList(),
       'runningHours': runningHours,
     };
@@ -78,8 +83,7 @@ class Location {
           ? UniqueId(id: map['parentLocation'])
           : null,
       parts: (map['parts'] as List).map((e) => UniqueId.fromMap(e)).toList(),
-      runningHours:
-          map['runningHours'] != null ? int.parse(map['runningHours']) : null,
+      runningHours: map['runningHours'],
     );
   }
 }

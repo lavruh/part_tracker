@@ -7,6 +7,19 @@ class LocationManagerState extends GetxController {
   final locations = <UniqueId, Location>{}.obs;
   final IDbService _db = Get.find();
   final table = 'locations';
+  Location? _selectedLocation;
+
+  toggleLocationSelection(Location val) {
+    if (_selectedLocation == val) {
+      _selectedLocation = null;
+    } else {
+      _selectedLocation = val;
+    }
+  }
+
+  bool isLocationSelected(Location other) {
+    return _selectedLocation == other;
+  }
 
   updateLocationRunningHours({required UniqueId locationId, int? rh}) {
     final location = locations[locationId];
@@ -23,8 +36,9 @@ class LocationManagerState extends GetxController {
   void _updateLocationAndSubLocations(Location location) {
     locations[location.id] = location;
 
-    if(location.parts.isNotEmpty){
-    //  call parts manager to update parts
+    if (location.parts.isNotEmpty) {
+      //  call parts manager to update parts
+      // throw UnimplementedError();
     }
 
     final subLocations = getSubLocations(location.id);
@@ -56,7 +70,7 @@ class LocationManagerState extends GetxController {
     _db.delete(id: id.toString(), table: table);
   }
 
-  List<Location> getSubLocations(UniqueId parentId) {
+  List<Location> getSubLocations(UniqueId? parentId) {
     return locations.values.where((e) => e.parentLocation == parentId).toList();
   }
 

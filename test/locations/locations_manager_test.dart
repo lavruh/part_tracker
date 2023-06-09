@@ -103,6 +103,22 @@ void main() {
       expect(sut.getParentLocation(subLocation2.id).runningHours, 10);
       expect(sut.getParentLocation(subSubLocation2.id).runningHours, 10);
     });
+
+    test(
+        'get sub locations should return locations with specified id or with null',
+        () async {
+      final loc = Location.empty(name: 'name');
+      await sut.updateLocation(loc);
+      await sut.updateLocation(loc.copyWith(id: UniqueId(id: 'root2')));
+      await sut.updateLocation(loc.copyWith(id: UniqueId(id: 'sub1'), parentLocation: loc.id));
+
+      final roots = sut.getSubLocations(null);
+      final subs = sut.getSubLocations(loc.id);
+
+      expect(subs.length, 1);
+      expect(roots.length, 2);
+      expect(roots, contains(loc));
+    });
   });
 
   test('toMap should return a valid map representation', () {
