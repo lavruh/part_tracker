@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 import 'package:part_tracker/di.mocks.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
@@ -20,7 +21,9 @@ initFakeDB() {
   final locations = [
     loc,
     loc.copyWith(
-        id: UniqueId(id: '2'), name: 'Aux Engine', runningHours: 12345),
+        id: UniqueId(id: '2'),
+        name: 'Aux Engine',
+        runningHours: RunningHours(12345)),
     loc.copyWith(id: UniqueId(id: 'ME_PS'), name: 'PS', parentLocation: loc.id),
     loc.copyWith(id: UniqueId(id: 'ME_SB'), name: 'SB', parentLocation: loc.id),
     loc.copyWith(

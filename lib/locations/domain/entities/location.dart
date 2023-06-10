@@ -1,3 +1,4 @@
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class Location {
@@ -6,7 +7,7 @@ class Location {
   final List<UniqueId> allowedPartTypes;
   final UniqueId? parentLocation;
   final List<UniqueId> parts;
-  final int? runningHours;
+  final RunningHours? runningHours;
 
   const Location({
     required this.id,
@@ -35,7 +36,7 @@ class Location {
     List<UniqueId>? allowedPartTypes,
     UniqueId? parentLocation,
     List<UniqueId>? parts,
-    int? runningHours,
+    RunningHours? runningHours,
     bool clearRunningHours = false,
     bool clearParentLocation = false,
   }) {
@@ -58,7 +59,7 @@ class Location {
       'allowedPartTypes': allowedPartTypes.map((e) => e.toMap()).toList(),
       'parentLocation': parentLocation?.toMap(),
       'parts': parts.map((e) => e.toMap()).toList(),
-      'runningHours': runningHours,
+      'runningHours': runningHours?.toMap(),
     };
   }
 
@@ -83,7 +84,9 @@ class Location {
           ? UniqueId(id: map['parentLocation'])
           : null,
       parts: (map['parts'] as List).map((e) => UniqueId.fromMap(e)).toList(),
-      runningHours: map['runningHours'],
+      runningHours: map['runningHours'] != null
+          ? RunningHours.fromMap(map['runningHours'])
+          : null,
     );
   }
 }

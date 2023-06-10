@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
+import 'package:part_tracker/running_hours/ui/widgets/running_hours_edit_dialog.dart';
 
 class LocationWidget extends StatelessWidget {
   const LocationWidget({
@@ -9,11 +11,13 @@ class LocationWidget extends StatelessWidget {
     required this.expandCallback,
     required this.selectCallback,
     required this.isSelected,
+    required this.updateRunningHours,
   }) : super(key: key);
   final TreeEntry<Location> entry;
   final bool isSelected;
   final Function expandCallback;
   final Function selectCallback;
+  final Function(RunningHours) updateRunningHours;
 
   @override
   Widget build(BuildContext context) {
@@ -48,5 +52,12 @@ class LocationWidget extends StatelessWidget {
     );
   }
 
-  void _showRhUpdateDialog(BuildContext context) {}
+  void _showRhUpdateDialog(BuildContext context) async {
+    final rh = await showDialog<RunningHours>(
+        context: context,
+        builder: (_) => RunningHoursEditDialog(item: entry.node.runningHours!));
+    if (rh != null) {
+      updateRunningHours(rh);
+    }
+  }
 }

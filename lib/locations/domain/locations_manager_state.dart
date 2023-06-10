@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
@@ -21,7 +22,7 @@ class LocationManagerState extends GetxController {
     return _selectedLocation == other;
   }
 
-  updateLocationRunningHours({required UniqueId locationId, int? rh}) {
+  updateLocationRunningHours({required UniqueId locationId, RunningHours? rh}) {
     final location = locations[locationId];
     if (location != null) {
       final updatedLocation = location.copyWith(

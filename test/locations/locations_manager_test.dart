@@ -4,6 +4,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
@@ -94,14 +95,14 @@ void main() {
       // Update the running hours for the location, sub-locations, and parts
       sut.updateLocationRunningHours(
         locationId: locationId,
-        rh: 10,
+        rh: RunningHours(10),
       );
 
       // Check if the running hours are updated correctly for the location, sub-locations, and parts
-      expect(sut.locations[locationId]?.runningHours, 10);
-      expect(sut.getParentLocation(subLocation1.id).runningHours, 10);
-      expect(sut.getParentLocation(subLocation2.id).runningHours, 10);
-      expect(sut.getParentLocation(subSubLocation2.id).runningHours, 10);
+      expect(sut.locations[locationId]?.runningHours, RunningHours(10));
+      expect(sut.getParentLocation(subLocation1.id).runningHours, RunningHours(10));
+      expect(sut.getParentLocation(subLocation2.id).runningHours, RunningHours(10));
+      expect(sut.getParentLocation(subSubLocation2.id).runningHours, RunningHours(10));
     });
 
     test(
@@ -128,7 +129,7 @@ void main() {
       allowedPartTypes: [UniqueId(), UniqueId()],
       parentLocation: UniqueId(),
       parts: [UniqueId(id: 'part1'), UniqueId(id: 'part2')],
-      runningHours: 123,
+      runningHours: RunningHours(123),
     );
 
     // Act
@@ -143,7 +144,7 @@ void main() {
     expect(map['parentLocation'], isA<String>());
     expect(map['parts'], isA<List<String>>());
     expect(map['parts'], hasLength(2));
-    expect(map['runningHours'], location.runningHours);
+    expect(map['runningHours'], location.runningHours?.toMap());
 
     final location2 = location.copyWith(clearRunningHours: true);
     final map2 = location2.toMap();

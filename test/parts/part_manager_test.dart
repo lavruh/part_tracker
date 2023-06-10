@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
@@ -30,15 +31,15 @@ void main() {
               item: initialPart.toMap(),
               table: sut.table))
           .called(1);
-      final updatedPart =
-          initialPart.copyWith(runningHours: 20, remarks: 'wo1232');
+      final updatedPart = initialPart.copyWith(
+          runningHours: RunningHours(20), remarks: 'wo1232');
 
       await sut.updatePart(updatedPart);
 
       final partAfterUpdate = sut.parts[initialPart.partNo];
       expect(partAfterUpdate, isNotNull);
       expect(partAfterUpdate!.remarks, updatedPart.remarks);
-      expect(partAfterUpdate.runningHours, 20);
+      expect(partAfterUpdate.runningHours, RunningHours(20));
       verify(dbMock.update(
               id: initialPart.partNo.toString(),
               item: updatedPart.toMap(),
@@ -86,15 +87,15 @@ void main() {
       final part1 = Part(
           partNo: UniqueId(id: 'p1'),
           type: type,
-          runningHours: 10,
+          runningHours: RunningHours(10),
           remarks: '');
       final part2 = Part(
           partNo: UniqueId(id: 'p2'),
           type: type,
-          runningHours: 15,
+          runningHours: RunningHours(15),
           remarks: '');
       final partIds = [part1.partNo, part2.partNo];
-      const updatedRunningHours = 20;
+      final updatedRunningHours = RunningHours(20);
       await sut.updatePart(part1);
       await sut.updatePart(part2);
 

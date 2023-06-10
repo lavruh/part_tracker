@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
@@ -31,7 +32,7 @@ class PartsManagerState extends GetxController {
 
   updatePartsRunningHours({
     required List<UniqueId> partIds,
-    required int runningHours,
+    required RunningHours runningHours,
   }) {
     for (final id in partIds) {
       if (parts.containsKey(id)) {

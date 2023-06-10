@@ -1,9 +1,10 @@
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class Part {
   final UniqueId partNo;
-  final int runningHours;
+  final RunningHours runningHours;
   final String remarks;
   final PartType type;
 
@@ -15,13 +16,13 @@ class Part {
   });
 
   Part.newPart({required this.partNo, required this.type, String? remarks})
-      : runningHours = 0,
+      : runningHours = RunningHours(0),
         remarks = remarks ?? '';
 
   Map<String, dynamic> toMap() {
     return {
       'partNo': partNo.toString(),
-      'runningHours': runningHours,
+      'runningHours': runningHours.toMap(),
       'remarks': remarks,
       'type': type.toMap(),
     };
@@ -30,7 +31,7 @@ class Part {
   factory Part.fromMap(Map<String, dynamic> map) {
     return Part(
       partNo: UniqueId(id: map['partNo']),
-      runningHours: map['runningHours'] ?? 0,
+      runningHours: RunningHours.fromMap(map['runningHours']),
       remarks: map['remarks'] as String,
       type: PartType.fromMap(map['type']),
     );
@@ -38,7 +39,7 @@ class Part {
 
   Part copyWith({
     UniqueId? partNo,
-    int? runningHours,
+    RunningHours? runningHours,
     String? remarks,
     PartType? type,
   }) {
