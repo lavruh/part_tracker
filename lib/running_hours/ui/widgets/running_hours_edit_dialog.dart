@@ -20,6 +20,7 @@ class RunningHoursEditDialog extends StatelessWidget {
           controller: state.textController,
           onChanged: state.updateItem,
           validator: state.validator,
+          decoration: const InputDecoration(labelText: 'Running hours'),
         ),
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
