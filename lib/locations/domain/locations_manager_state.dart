@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
+import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
@@ -9,12 +10,15 @@ class LocationManagerState extends GetxController {
   final IDbService _db = Get.find();
   final table = 'locations';
   Location? _selectedLocation;
+  final _editor = Get.find<LocationEditorState>();
 
   toggleLocationSelection(Location val) {
     if (_selectedLocation == val) {
       _selectedLocation = null;
+      _editor.clearLocation();
     } else {
       _selectedLocation = val;
+      _editor.setLocation(val);
     }
   }
 

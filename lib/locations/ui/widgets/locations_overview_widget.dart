@@ -25,7 +25,8 @@ class LocationsOverviewWidget extends StatelessWidget {
                     treeController.toggleExpansion(entry.node),
                 selectCallback: () {
                   state.toggleLocationSelection(entry.node);
-                  treeController.rebuild();
+                  treeController.expand(entry.node);
+                  // treeController.rebuild();
                 },
                 updateRunningHours: (val) {
                   state.updateLocationRunningHours(

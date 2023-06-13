@@ -20,7 +20,7 @@ class Location {
 
   @override
   String toString() {
-    return 'Location{id: $id, name: $name, parentLocation: $parentLocation}';
+    return 'Location{id: $id, name: $name, parentLocation: $parentLocation, $allowedPartTypes}';
   }
 
   Location.empty({required this.name})
@@ -30,7 +30,7 @@ class Location {
         runningHours = null,
         parts = [];
 
-  Location copyWith({
+    Location copyWith({
     UniqueId? id,
     String? name,
     List<UniqueId>? allowedPartTypes,
