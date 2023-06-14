@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
+import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 
 class LocationEditorState extends GetxController {
   final item = <Location>[].obs;
@@ -19,33 +19,12 @@ class LocationEditorState extends GetxController {
   }
 
   setLocation(Location l) async {
-    bool actFl = true;
+    bool? actFl = true;
     if (item.isNotEmpty && _isChanged.value) {
-      await Get.defaultDialog(
-        title: '',
-        content: const Text('Save changes?'),
-        actions: [
-          TextButton(
-              onPressed: () {
-                save();
-                Get.back();
-              },
-              child: const Text('Yes')),
-          TextButton(
-              onPressed: () {
-                actFl = false;
-                Get.back();
-              },
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: const Text('No')),
-        ],
-      );
+      actFl = await questionDialogWidget(
+          question: 'Save changes?', onConfirm: save());
     }
-    if (actFl) {
+    if (actFl == null || actFl) {
       item.value = [l];
       _isChanged.value = false;
       update();

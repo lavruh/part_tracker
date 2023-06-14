@@ -5,6 +5,7 @@ import 'package:part_tracker/di.mocks.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
+import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/part_types/domain/part_types_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
@@ -16,8 +17,8 @@ initDependencies() {
   initFakeDB();
   Get.put(PartTypesState());
   Get.put(LocationEditorState());
-  final locationsManager = Get.put(LocationManagerState());
-  locationsManager.getAllLocations();
+  Get.put(LocationsMenuState());
+  Get.put(LocationManagerState());
 }
 
 initFakeDB() {

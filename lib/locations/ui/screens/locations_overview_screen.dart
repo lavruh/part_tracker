@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:part_tracker/locations/domain/entities/location.dart';
-import 'package:part_tracker/locations/domain/location_editor_state.dart';
+import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/ui/widgets/location_editor_widget.dart';
+import 'package:part_tracker/locations/ui/widgets/locations_menu_bar_widget.dart';
 import 'package:part_tracker/locations/ui/widgets/locations_overview_widget.dart';
 
 class LocationsOverviewScreen extends StatelessWidget {
@@ -10,32 +10,25 @@ class LocationsOverviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Row(
-        children: [
-          Flexible(
-              child: Stack(
-            alignment: AlignmentDirectional.topEnd,
-            children: [
-              const LocationsOverviewWidget(),
-              Card(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Get.find<LocationEditorState>()
-                              .setLocation(Location.empty(name: ''));
-                        },
-                        icon: const Icon(Icons.add))
-                  ],
-                ),
-              )
-            ],
-          )),
-          const Flexible(child: LocationEditorWidget()),
-        ],
+    return GestureDetector(
+      onTapUp: (d) {
+        Get.find<LocationManagerState>().toggleLocationSelection(null);
+      },
+      child: Scaffold(
+        appBar: AppBar(),
+        body: const Row(
+          children: [
+            Flexible(
+                child: Stack(
+              alignment: AlignmentDirectional.topEnd,
+              children: [
+                LocationsOverviewWidget(),
+                LocationsMenuBarWidget(),
+              ],
+            )),
+            Flexible(child: LocationEditorWidget()),
+          ],
+        ),
       ),
     );
   }

@@ -1,29 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 
 class LocationsMenuBarWidget extends StatelessWidget {
   const LocationsMenuBarWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Row(
-        children: [
-          IconButton(
-              onPressed: () {}, icon: const Icon(Icons.edit), tooltip: 'Edit'),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.copy),
-              tooltip: 'Duplicate'),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.add),
-              tooltip: 'Add child'),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.delete),
-              tooltip: 'Delete'),
-        ],
-      ),
-    );
+    return GetX<LocationsMenuState>(builder: (state) {
+      if (state.visible.value == false) return Container();
+
+      final createMenu = [
+        IconButton(
+            onPressed: () => state.openEditor(), icon: const Icon(Icons.add)),
+      ];
+      final editMenu = [
+        IconButton(
+            onPressed: () => state.openEditor(),
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit'),
+        IconButton(
+            onPressed: () => state.duplicateSelectedItem(),
+            icon: const Icon(Icons.copy),
+            tooltip: 'Duplicate'),
+        IconButton(
+            onPressed: () => state.addSubLocation(),
+            icon: const Icon(Icons.account_tree),
+            tooltip: 'Add sub location'),
+        IconButton(
+            onPressed: () => state.deleteSelectedLocation(),
+            icon: const Icon(Icons.delete),
+            tooltip: 'Delete'),
+      ];
+
+      return Card(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: state.isLocationSelected ? editMenu : createMenu,
+        ),
+      );
+    });
   }
 }

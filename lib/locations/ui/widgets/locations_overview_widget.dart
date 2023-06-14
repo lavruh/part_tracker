@@ -10,12 +10,9 @@ class LocationsOverviewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetX<LocationManagerState>(builder: (state) {
-      final roots = state.getSubLocations(null);
-      final treeController = TreeController(
-          roots: roots,
-          childrenProvider: (location) {
-            return state.getSubLocations(location.id);
-          });
+      state.getSubLocations(null); //this line to force getx to work
+
+      final treeController = state.treeController;
       return AnimatedTreeView(
           treeController: treeController,
           nodeBuilder: (_, entry) {
@@ -25,8 +22,6 @@ class LocationsOverviewWidget extends StatelessWidget {
                     treeController.toggleExpansion(entry.node),
                 selectCallback: () {
                   state.toggleLocationSelection(entry.node);
-                  treeController.expand(entry.node);
-                  // treeController.rebuild();
                 },
                 updateRunningHours: (val) {
                   state.updateLocationRunningHours(

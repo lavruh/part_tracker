@@ -27,7 +27,6 @@ class LocationEditorWidget extends StatelessWidget {
                 },
               ),
               PartTypesWidget(
-                // key: Key(state.getLocation.allowedPartTypes.toString()),
                 selected: state.getLocation.allowedPartTypes,
                 updateSelected: (List<UniqueId> val) {
                   state.updateLocation(
