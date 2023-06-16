@@ -1,7 +1,8 @@
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
-import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
+import 'package:part_tracker/locations/ui/widgets/location_editor_widget.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 
 class LocationEditorState extends GetxController {
   final item = <Location>[].obs;
@@ -18,17 +19,15 @@ class LocationEditorState extends GetxController {
     update();
   }
 
+  openEditorDialog(Location l) async {
+    setLocation(l);
+    Get.defaultDialog(content: const LocationEditorWidget(),title: 'Edit location');
+  }
+
   setLocation(Location l) async {
-    bool? actFl = true;
-    if (item.isNotEmpty && _isChanged.value) {
-      actFl = await questionDialogWidget(
-          question: 'Save changes?', onConfirm: save());
-    }
-    if (actFl == null || actFl) {
-      item.value = [l];
-      _isChanged.value = false;
-      update();
-    }
+    item.value = [l];
+    _isChanged.value = false;
+    update();
   }
 
   updateLocation(Location l) {
@@ -41,5 +40,15 @@ class LocationEditorState extends GetxController {
     Get.find<LocationManagerState>().updateLocation(item.first);
     _isChanged.value = false;
     update();
+  }
+
+  bool get hasCounter => getLocation.runningHours != null;
+
+  toggleRunningHoursCounter() {
+    if (hasCounter) {
+      updateLocation(getLocation.copyWith(clearRunningHours: true));
+    } else {
+      updateLocation(getLocation.copyWith(runningHours: RunningHours(0)));
+    }
   }
 }

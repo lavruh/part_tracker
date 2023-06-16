@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
-import 'package:part_tracker/locations/ui/widgets/location_editor_widget.dart';
 import 'package:part_tracker/locations/ui/widgets/locations_menu_bar_widget.dart';
 import 'package:part_tracker/locations/ui/widgets/locations_overview_widget.dart';
 
@@ -26,7 +25,7 @@ class LocationsOverviewScreen extends StatelessWidget {
                 LocationsMenuBarWidget(),
               ],
             )),
-            Flexible(child: LocationEditorWidget()),
+            Flexible(child: Column()),
           ],
         ),
       ),

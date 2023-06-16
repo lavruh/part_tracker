@@ -8,35 +8,43 @@ import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 class LocationsMenuState extends GetxController {
   final visible = false.obs;
   final _editor = Get.find<LocationEditorState>();
-  Location? _selectedLocation;
+  final _selectedLocation = <Location>[].obs;
 
-  bool get isLocationSelected => _selectedLocation != null;
+  bool get isLocationSelected => _selectedLocation.isNotEmpty;
 
   showMenu(Location val) {
     visible.value = true;
-    _selectedLocation = val;
+    _selectedLocation.value = [val];
   }
 
   toggleMenu(Location? val) {
     visible.value = !visible.value;
-    _selectedLocation = val;
+    if (val != null) {
+      _selectedLocation.value = [val];
+    } else {
+      _selectedLocation.clear();
+    }
   }
 
   openEditor() {
-    _editor.setLocation(_selectedLocation ?? Location.empty(name: ''));
+    if (isLocationSelected) {
+      _editor.openEditorDialog(_selectedLocation.first);
+    } else {
+      _editor.openEditorDialog(Location.empty(name: ''));
+    }
   }
 
   duplicateSelectedItem() {
-    final l = _selectedLocation;
-    if (l != null) {
+    final l = _selectedLocation.first;
+    if (isLocationSelected) {
       Get.find<LocationManagerState>()
           .updateLocation(l.copyWith(id: UniqueId(), name: "${l.name}_"));
     }
   }
 
   addSubLocation() {
-    final l = _selectedLocation;
-    if (l != null) {
+    final l = _selectedLocation.first;
+    if (isLocationSelected) {
       Get.find<LocationManagerState>().updateLocation(
         Location.empty(name: 'name').copyWith(parentLocation: l.id),
       );
@@ -44,8 +52,8 @@ class LocationsMenuState extends GetxController {
   }
 
   deleteSelectedLocation() async {
-    final l = _selectedLocation;
-    if (l != null) {
+    final l = _selectedLocation.first;
+    if (isLocationSelected) {
       final act = await questionDialogWidget(question: 'Delete location?');
       if (act != null && act) {
         Get.find<LocationManagerState>().deleteLocation(l.id);

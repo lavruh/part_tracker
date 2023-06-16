@@ -16,9 +16,9 @@ Future<bool?> questionDialogWidget({
             },
             child: const Text('Yes')),
         TextButton(
-            onPressed: () => Get.back(result: false),
+            onPressed: () => Get.back(result: null),
             child: const Text('Cancel')),
         TextButton(
-            onPressed: () => Get.back(result: null), child: const Text('No')),
+            onPressed: () => Get.back(result: false), child: const Text('No')),
       ]);
 }

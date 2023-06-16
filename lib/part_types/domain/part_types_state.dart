@@ -7,12 +7,19 @@ class PartTypesState extends GetxController {
   final types = <UniqueId, PartType>{}.obs;
   final IDbService db = Get.find();
   final _tableName = 'part_types';
+  final _editMode = false.obs;
 
   PartTypesState() {
     getAll();
   }
 
-  createPartType() {}
+  bool get isEditMode => _editMode.value;
+
+  toggleMode() => _editMode.value = !_editMode.value;
+
+  createPartType() {
+    updatePartType(PartType(id: UniqueId(), name: ''));
+  }
 
   updatePartType(PartType type) {
     types[type.id] = type;
