@@ -12,6 +12,13 @@ class LocationsMenuState extends GetxController {
 
   bool get isLocationSelected => _selectedLocation.isNotEmpty;
 
+  Location? get selectedLocation {
+    if (_selectedLocation.isNotEmpty) {
+      return _selectedLocation.first;
+    }
+    return null;
+  }
+
   showMenu(Location val) {
     visible.value = true;
     _selectedLocation.value = [val];

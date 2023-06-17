@@ -9,6 +9,10 @@ class PartsManagerState extends GetxController {
   final IDbService _db = Get.find();
   final table = 'parts';
 
+  PartsManagerState() {
+    getParts();
+  }
+
   updatePart(Part part) async {
     _updateState(part);
     _db.update(id: part.partNo.toString(), item: part.toMap(), table: table);
@@ -28,6 +32,16 @@ class PartsManagerState extends GetxController {
       final part = Part.fromMap(map);
       _updateState(part);
     }
+  }
+
+  List<Part> getPartWithIds(List<UniqueId> ids) {
+    List<Part> res = [];
+    for (final key in ids) {
+      if (parts.containsKey(key)) {
+        res.add(parts[key]!);
+      }
+    }
+    return res;
   }
 
   updatePartsRunningHours({

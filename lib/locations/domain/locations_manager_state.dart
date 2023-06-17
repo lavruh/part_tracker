@@ -118,6 +118,26 @@ class LocationManagerState extends GetxController {
       throw LocationManagerException('Item <$parentId> does not exist');
     }
   }
+
+  movePartFromSelected({
+    required UniqueId partId,
+    required UniqueId targetLocation,
+  }) {
+    if(_selectedLocation !=null) {
+      movePartBetweenLocations(partId: partId,
+          sourceLocation: _selectedLocation!.id,
+          targetLocation: targetLocation);
+    }
+  }
+
+
+  movePartBetweenLocations({
+    required UniqueId partId,
+    required UniqueId sourceLocation,
+    required UniqueId targetLocation,
+  }) {
+  //  check if running hours up to date
+  }
 }
 
 class LocationManagerException implements Exception {
