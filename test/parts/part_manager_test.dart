@@ -20,8 +20,13 @@ void main() {
   group('PartsManagerState', () {
     setUp(() {
       dbMock = Get.put<IDbService>(MockIDbService());
+      when(dbMock.getAll(table: 'parts'))
+          .thenAnswer((_) => const Stream.empty());
       sut = PartsManagerState();
+      verify(dbMock.getAll(table: sut.table)).called(1);
     });
+
+    tearDown(() => sut.parts.clear());
 
     test('updatePart should update the part correctly', () async {
       final initialPart = Part.newPart(partNo: UniqueId(), type: type);
