@@ -51,4 +51,8 @@ class RunningHours {
       date: date ?? this.date,
     );
   }
+
+  RunningHours operator +(RunningHours other) {
+    return RunningHours(value + other.value);
+  }
 }

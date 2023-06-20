@@ -20,7 +20,7 @@ class Location {
 
   @override
   String toString() {
-    return 'Location{id: $id, name: $name, parentLocation: $parentLocation, $allowedPartTypes}';
+    return 'Location{name: $name, parts: $parts}';
   }
 
   Location.empty({required this.name})

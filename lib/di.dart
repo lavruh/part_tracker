@@ -49,16 +49,21 @@ initFakeDB() {
   final locations = [
     loc,
     loc.copyWith(
+      id: UniqueId(id: 'QueenStore'),
+      name: 'Queen store',
+      parts: parts.map((e) => e.partNo).toList(),
+    ),
+    loc.copyWith(
         id: UniqueId(id: '2'),
         name: 'Aux Engine',
         runningHours: RunningHours(12345)),
     loc.copyWith(id: UniqueId(id: 'ME_PS'), name: 'PS', parentLocation: loc.id),
     loc.copyWith(id: UniqueId(id: 'ME_SB'), name: 'SB', parentLocation: loc.id),
     loc.copyWith(
-        id: UniqueId(id: 'ME_PS_A1'),
-        name: 'A1',
-        parentLocation: UniqueId(id: 'ME_PS'),
-        parts: parts.map((e) => e.partNo).toList()),
+      id: UniqueId(id: 'ME_PS_A1'),
+      name: 'A1',
+      parentLocation: UniqueId(id: 'ME_PS'),
+    ),
     loc.copyWith(
         id: UniqueId(id: 'ME_PS_B2'),
         name: 'B2',

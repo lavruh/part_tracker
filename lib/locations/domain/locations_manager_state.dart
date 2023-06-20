@@ -2,6 +2,7 @@ import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
+import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
@@ -50,8 +51,6 @@ class LocationManagerState extends GetxController {
       final updatedLocation = location.copyWith(
         runningHours: rh,
       );
-
-      // Update the location and its sub-locations
       _updateLocationAndSubLocations(updatedLocation);
     }
   }
@@ -59,9 +58,10 @@ class LocationManagerState extends GetxController {
   void _updateLocationAndSubLocations(Location location) {
     updateLocation(location);
 
-    if (location.parts.isNotEmpty) {
-      //  call parts manager to update parts
-      // throw UnimplementedError();
+    if (location.parts.isNotEmpty && location.runningHours != null) {
+      final RunningHours rh = location.runningHours!;
+      Get.find<PartsManagerState>()
+          .updatePartsRunningHours(partIds: location.parts, runningHours: rh);
     }
 
     final subLocations = getSubLocations(location.id);
@@ -122,21 +122,58 @@ class LocationManagerState extends GetxController {
   movePartFromSelected({
     required UniqueId partId,
     required UniqueId targetLocation,
-  }) {
-    if(_selectedLocation !=null) {
-      movePartBetweenLocations(partId: partId,
-          sourceLocation: _selectedLocation!.id,
-          targetLocation: targetLocation);
+  }) async {
+    if (_selectedLocation != null) {
+      try {
+        await movePartBetweenLocations(
+            partId: partId,
+            sourceLocation: _selectedLocation!.id,
+            targetLocation: targetLocation);
+        final target = locations[targetLocation];
+        _menu.showMenu(target!);
+      } on LocationManagerException catch (e) {
+        Get.snackbar('Error', e.toString());
+      }
     }
   }
-
 
   movePartBetweenLocations({
     required UniqueId partId,
     required UniqueId sourceLocation,
     required UniqueId targetLocation,
-  }) {
-  //  check if running hours up to date
+  }) async {
+    final partsManager = Get.find<PartsManagerState>();
+    final source = locations[sourceLocation];
+    final target = locations[targetLocation];
+    if (source == null || target == null) {
+      throw LocationManagerException('Invalid source or target location');
+    }
+    final parts = partsManager.getPartWithIds([partId]);
+    if (parts.isEmpty) {
+      throw LocationManagerException('Part not found');
+    }
+    final part = parts.first;
+    final partRhUpdateDate = part.runningHours.date;
+    final n = DateTime.now();
+    if (partRhUpdateDate.millisecondsSinceEpoch <
+        DateTime(n.year, n.month, n.day).millisecondsSinceEpoch) {
+      throw LocationManagerException('Running hours are not up to date');
+    }
+    final targetParts = partsManager.getPartWithIds(target.parts);
+    for (final i in targetParts) {
+      if (i.type == part.type) {
+        throw LocationManagerException(
+            'Target location already has a part with the same part type');
+      }
+    }
+
+    List<UniqueId> tmp = source.parts;
+    tmp.removeWhere((e) => e.id == partId.id);
+    updateLocation(source.copyWith(parts: tmp));
+
+    tmp = target.parts;
+    tmp.add(partId);
+    updateLocation(target.copyWith(parts: tmp));
   }
 }
 

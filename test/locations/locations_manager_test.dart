@@ -6,6 +6,9 @@ import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
+import 'package:part_tracker/part_types/domain/entities/part_type.dart';
+import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
@@ -17,13 +20,16 @@ void main() {
   late LocationManagerState sut;
   late Location location;
   late IDbService dbMock;
+  late PartsManagerState partsManagerState;
 
   setUp(() async {
     dbMock = Get.put<IDbService>(MockIDbService());
     when(dbMock.getAll(table: 'locations'))
         .thenAnswer((_) => const Stream.empty());
+    when(dbMock.getAll(table: 'parts')).thenAnswer((_) => const Stream.empty());
     Get.put(LocationEditorState());
     Get.put(LocationsMenuState());
+    partsManagerState = Get.put(PartsManagerState());
     sut = Get.put(LocationManagerState());
     location = Location.empty(name: 'test location');
   });
@@ -79,19 +85,26 @@ void main() {
       () async {
     final locationId = UniqueId();
     final location = Location.empty(name: 'test location');
-    sut.updateLocation(location);
+    final partId = UniqueId();
+    final part = Part.newPart(partNo: partId, type: PartType.empty());
+    final p2 = part.copyWith(partNo: UniqueId(id: 'p2'));
+    final p3 = part.copyWith(partNo: UniqueId(id: 'p3'));
+    await partsManagerState.updatePart(part);
+    await partsManagerState.updatePart(p2);
+    await partsManagerState.updatePart(p3);
+    await sut.updateLocation(location);
     final subLocation1 = location.copyWith(
         id: UniqueId(id: 'sub1'),
         name: 'Sub Location 1',
         parentLocation: locationId,
-        parts: [UniqueId()]);
+        parts: [p2.partNo]);
     final subLocation2 =
         subLocation1.copyWith(id: UniqueId(id: 'sub2'), name: 'Sub Location 2');
     final subSubLocation2 = subLocation2.copyWith(
         id: UniqueId(id: 'ss2'),
         name: 'ss2',
         parentLocation: subLocation2.id,
-        parts: [UniqueId()]);
+        parts: [p3.partNo]);
     // Add the sub-locations to the state
     sut.updateLocation(subLocation1);
     sut.updateLocation(subLocation2);
@@ -180,5 +193,43 @@ void main() {
     expect(location.parentLocation, isA<UniqueId>());
     expect(location.parts, isA<List<UniqueId>>());
     expect(location.parts, hasLength(2));
+  });
+
+  test('Move Part Between Locations', () async {
+    // Create locations
+    final sourceLocationId = UniqueId(id: 'source');
+    final targetLocationId = UniqueId(id: 'target');
+    final partId = UniqueId();
+    final part = Part.newPart(partNo: partId, type: PartType.empty());
+
+    final sourceLocation = Location(
+      id: sourceLocationId,
+      name: 'Source Location',
+      parts: [partId],
+      allowedPartTypes: [],
+    );
+
+    final targetLocation = Location(
+      id: targetLocationId,
+      name: 'Target Location',
+      parts: [],
+      allowedPartTypes: [],
+    );
+
+    // Add locations to the state
+    await partsManagerState.updatePart(part);
+    await sut.updateLocation(sourceLocation);
+    await sut.updateLocation(targetLocation);
+
+    // Call the method
+    await sut.movePartBetweenLocations(
+      partId: partId,
+      sourceLocation: sourceLocationId,
+      targetLocation: targetLocationId,
+    );
+
+    // Verify that the part was moved to the target location
+    expect(sut.locations[targetLocationId]?.parts, contains(partId));
+    expect(sut.locations[sourceLocationId]?.parts, isEmpty);
   });
 }

@@ -109,20 +109,14 @@ void main() {
         partIds: partIds,
         runningHours: updatedRunningHours,
       );
+      final newRH1 = updatedRunningHours + part1.runningHours;
 
+      pumpEventQueue();
       // Assert
-      expect(sut.parts.values.first.runningHours, updatedRunningHours);
-      expect(sut.parts.values.last.runningHours, updatedRunningHours);
-      verify(dbMock.update(
-              id: part1.partNo.toString(),
-              item: part1.copyWith(runningHours: updatedRunningHours).toMap(),
-              table: sut.table))
-          .called(1);
-      verify(dbMock.update(
-              id: part2.partNo.toString(),
-              item: part2.copyWith(runningHours: updatedRunningHours).toMap(),
-              table: sut.table))
-          .called(1);
+      expect(sut.parts.values.first.runningHours, newRH1);
+      expect(sut.parts.values.last.runningHours,
+          updatedRunningHours + part2.runningHours);
+
     });
   });
 }

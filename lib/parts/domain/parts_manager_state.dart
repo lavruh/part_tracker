@@ -49,9 +49,10 @@ class PartsManagerState extends GetxController {
     required RunningHours runningHours,
   }) {
     for (final id in partIds) {
-      if (parts.containsKey(id)) {
-        final item = parts[id];
-        updatePart(item!.copyWith(runningHours: runningHours));
+      final item = parts[id];
+      if (item != null) {
+        final partRh = item.runningHours;
+        updatePart(item.copyWith(runningHours: partRh + runningHours));
       } else {
         throw Exception('PartNo[$id] does not exists');
       }
