@@ -11,7 +11,7 @@ class LocationManagerState extends GetxController {
   final locations = <UniqueId, Location>{}.obs;
   final IDbService _db = Get.find();
   final table = 'locations';
-  Location? _selectedLocation;
+  // Location? _selectedLocation;
   final _menu = Get.find<LocationsMenuState>();
   late TreeController<Location> _treeController;
 
@@ -30,19 +30,21 @@ class LocationManagerState extends GetxController {
         });
   }
 
+  Location? get _selectedLocation => _menu.selectedLocation;
+
   toggleLocationSelection(Location? val) {
     if (_selectedLocation == val || val == null) {
-      _selectedLocation = null;
+      // _selectedLocation = null;
       _menu.toggleMenu(null);
     } else {
-      _selectedLocation = val;
+      // _selectedLocation = val;
       _menu.showMenu(val);
     }
     treeController.rebuild();
   }
 
   bool isLocationSelected(Location other) {
-    return _selectedLocation == other;
+    return other == _menu.selectedLocation;
   }
 
   updateLocationRunningHours({required UniqueId locationId, RunningHours? rh}) {
