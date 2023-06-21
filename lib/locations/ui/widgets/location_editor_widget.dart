@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/part_types/ui/widgets/part_types_widget.dart';
-import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 
 class LocationEditorWidget extends StatelessWidget {
@@ -45,7 +44,7 @@ class LocationEditorWidget extends StatelessWidget {
                       ),
                       PartTypesWidget(
                         selected: state.getLocation.allowedPartTypes,
-                        updateSelected: (List<UniqueId> val) {
+                        updateSelected: (val) {
                           state.updateLocation(state.getLocation
                               .copyWith(allowedPartTypes: val));
                         },

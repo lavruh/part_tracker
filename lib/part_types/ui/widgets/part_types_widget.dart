@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/part_types/domain/part_types_state.dart';
+import 'package:part_tracker/part_types/ui/widgets/qty_edit_dialog.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class PartTypesWidget extends StatelessWidget {
   const PartTypesWidget(
       {Key? key, required this.selected, required this.updateSelected})
       : super(key: key);
-  final List<UniqueId> selected;
-  final Function(List<UniqueId>) updateSelected;
+  final Map<UniqueId, int?> selected;
+  final Function(Map<UniqueId, int?>) updateSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +31,9 @@ class PartTypesWidget extends StatelessWidget {
                             ),
                           )
                         : InputChip(
-                            label: Text(e.name),
+                            label: Text("${e.name}${_getQty(e.id)}"),
                             selected: _isPartTypeSelected(e.id),
-                            onPressed: () => _toggleState(e),
+                            onPressed: () => _showQtyEditDialog(e),
                           ),
                   ))
               .toList()
@@ -75,18 +76,26 @@ class PartTypesWidget extends StatelessWidget {
     });
   }
 
-  void _toggleState(PartType e) {
-    final index = selected.indexOf(e.id);
-    if (index != -1) {
-      selected.removeAt(index);
-    } else {
-      selected.add(e.id);
-    }
-    updateSelected(selected);
+  bool _isPartTypeSelected(UniqueId id) {
+    return selected.containsKey(id);
   }
 
-  bool _isPartTypeSelected(UniqueId id) {
-    return selected.contains(id);
+  _showQtyEditDialog(PartType e) {
+    Get.defaultDialog(
+        title: e.name,
+        content: QtyEditDialog(
+          item: e,
+          isSelected: _isPartTypeSelected(e.id),
+          updateCallback: (MapEntry<UniqueId, int?>? val) {
+            if (val != null) {
+              selected.addEntries([val]);
+            } else {
+              selected.remove(e.id);
+            }
+            updateSelected(selected);
+            Get.back();
+          },
+        ));
   }
 
   _showNameEditDialog(
@@ -106,5 +115,14 @@ class PartTypesWidget extends StatelessWidget {
             child: const Text('Confirm'),
           )
         ]);
+  }
+
+  String _getQty(UniqueId id) {
+    if(!selected.containsKey(id)) return '';
+    final qty = selected[id];
+    if(qty!=null && qty > 0){
+      return "\t$qty pcs";
+    }
+    return '';
   }
 }

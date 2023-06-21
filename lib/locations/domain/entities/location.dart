@@ -4,7 +4,7 @@ import 'package:part_tracker/utils/domain/unique_id.dart';
 class Location {
   final UniqueId id;
   final String name;
-  final List<UniqueId> allowedPartTypes;
+  final Map<UniqueId, int?> allowedPartTypes;
   final UniqueId? parentLocation;
   final List<UniqueId> parts;
   final RunningHours? runningHours;
@@ -25,15 +25,15 @@ class Location {
 
   Location.empty({required this.name})
       : id = UniqueId(),
-        allowedPartTypes = [],
+        allowedPartTypes = {},
         parentLocation = null,
         runningHours = null,
         parts = [];
 
-    Location copyWith({
+  Location copyWith({
     UniqueId? id,
     String? name,
-    List<UniqueId>? allowedPartTypes,
+    Map<UniqueId, int?>? allowedPartTypes,
     UniqueId? parentLocation,
     List<UniqueId>? parts,
     RunningHours? runningHours,
@@ -56,7 +56,8 @@ class Location {
     return {
       'id': id.toMap(),
       'name': name,
-      'allowedPartTypes': allowedPartTypes.map((e) => e.toMap()).toList(),
+      'allowedPartTypes':
+          allowedPartTypes.map((k, v) => MapEntry(k.toMap(), v)),
       'parentLocation': parentLocation?.toMap(),
       'parts': parts.map((e) => e.toMap()).toList(),
       'runningHours': runningHours?.toMap(),
@@ -72,14 +73,17 @@ class Location {
   int get hashCode => id.hashCode;
 
   factory Location.fromMap(Map<String, dynamic> map) {
-    List<UniqueId> allowedPartTypes = [];
-    map['allowedPartTypes'].forEach((e) {
-      allowedPartTypes.add(UniqueId.fromMap(e));
-    });
+    Map<UniqueId, int?> allowedPT = {};
+    final Map<String, int?> mapAllowedPT = map['allowedPartTypes'];
+    for (final key in mapAllowedPT .keys) {
+      allowedPT.putIfAbsent(UniqueId.fromMap(key), () => mapAllowedPT[key]);
+    }
+    // print(map['allowedPartTypes']);
+
     return Location(
       id: UniqueId(id: map['id']),
       name: map['name'] as String,
-      allowedPartTypes: allowedPartTypes,
+      allowedPartTypes: allowedPT,
       parentLocation: map['parentLocation'] != null
           ? UniqueId(id: map['parentLocation'])
           : null,

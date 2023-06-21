@@ -147,7 +147,10 @@ void main() {
     final location = Location(
       id: UniqueId(),
       name: 'Test Location',
-      allowedPartTypes: [UniqueId(), UniqueId()],
+      allowedPartTypes: {
+        UniqueId(id: 'type1'): null,
+        UniqueId(id: 'type2'): null
+      },
       parentLocation: UniqueId(),
       parts: [UniqueId(id: 'part1'), UniqueId(id: 'part2')],
       runningHours: RunningHours(123),
@@ -160,8 +163,8 @@ void main() {
     expect(map, isA<Map<String, dynamic>>());
     expect(map['id'], isA<String>());
     expect(map['name'], 'Test Location');
-    expect(map['allowedPartTypes'], isA<List<dynamic>>());
-    expect(map['allowedPartTypes'], hasLength(2));
+    expect(map['allowedPartTypes'], isA<Map<String, dynamic>>());
+    expect(map['allowedPartTypes'].keys.length, 2);
     expect(map['parentLocation'], isA<String>());
     expect(map['parts'], isA<List<String>>());
     expect(map['parts'], hasLength(2));
@@ -177,8 +180,8 @@ void main() {
     final map = Location(
       id: UniqueId(),
       name: 'Test Location',
-      allowedPartTypes: [UniqueId(), UniqueId()],
-      parentLocation: UniqueId(),
+      allowedPartTypes: {UniqueId(id: 'pt1'): null, UniqueId(id: 'pt2'): null},
+      parentLocation: UniqueId(id: 'parentLoc'),
       parts: [UniqueId(id: 'part1'), UniqueId(id: 'part2')],
     ).toMap();
 
@@ -188,7 +191,7 @@ void main() {
     // Assert
     expect(location.id, isA<UniqueId>());
     expect(location.name, 'Test Location');
-    expect(location.allowedPartTypes, isA<List<UniqueId>>());
+    expect(location.allowedPartTypes, isA<Map<UniqueId, int?>>());
     expect(location.allowedPartTypes, hasLength(2));
     expect(location.parentLocation, isA<UniqueId>());
     expect(location.parts, isA<List<UniqueId>>());
@@ -206,14 +209,14 @@ void main() {
       id: sourceLocationId,
       name: 'Source Location',
       parts: [partId],
-      allowedPartTypes: [],
+      allowedPartTypes: {},
     );
 
     final targetLocation = Location(
       id: targetLocationId,
       name: 'Target Location',
       parts: [],
-      allowedPartTypes: [],
+      allowedPartTypes: {},
     );
 
     // Add locations to the state
