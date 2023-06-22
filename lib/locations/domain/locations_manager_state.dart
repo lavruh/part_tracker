@@ -34,10 +34,8 @@ class LocationManagerState extends GetxController {
 
   toggleLocationSelection(Location? val) {
     if (_selectedLocation == val || val == null) {
-      // _selectedLocation = null;
       _menu.toggleMenu(null);
     } else {
-      // _selectedLocation = val;
       _menu.showMenu(val);
     }
     treeController.rebuild();
@@ -134,7 +132,7 @@ class LocationManagerState extends GetxController {
         final target = locations[targetLocation];
         _menu.showMenu(target!);
       } on LocationManagerException catch (e) {
-        Get.snackbar('Error', e.toString());
+        Get.defaultDialog(middleText: e.m);
       }
     }
   }
@@ -161,12 +159,19 @@ class LocationManagerState extends GetxController {
         DateTime(n.year, n.month, n.day).millisecondsSinceEpoch) {
       throw LocationManagerException('Running hours are not up to date');
     }
+
+    if (!target.allowedPartTypes.containsKey(part.type.id)) {
+      throw LocationManagerException(
+          'Part is not suitable for target location');
+    }
+    final partTypeQty = target.allowedPartTypes[part.type.id];
     final targetParts = partsManager.getPartWithIds(target.parts);
-    for (final i in targetParts) {
-      if (i.type == part.type) {
-        throw LocationManagerException(
-            'Target location already has a part with the same part type');
-      }
+    final sameTypeParts = targetParts.where((e) => e.type == part.type);
+    if (partTypeQty != null &&
+        sameTypeParts.length + 1 > partTypeQty &&
+        partTypeQty != 0) {
+      throw LocationManagerException(
+          'Location already has a part of same type');
     }
 
     List<UniqueId> tmp = source.parts;

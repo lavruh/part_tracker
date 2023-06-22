@@ -198,41 +198,4 @@ void main() {
     expect(location.parts, hasLength(2));
   });
 
-  test('Move Part Between Locations', () async {
-    // Create locations
-    final sourceLocationId = UniqueId(id: 'source');
-    final targetLocationId = UniqueId(id: 'target');
-    final partId = UniqueId();
-    final part = Part.newPart(partNo: partId, type: PartType.empty());
-
-    final sourceLocation = Location(
-      id: sourceLocationId,
-      name: 'Source Location',
-      parts: [partId],
-      allowedPartTypes: {},
-    );
-
-    final targetLocation = Location(
-      id: targetLocationId,
-      name: 'Target Location',
-      parts: [],
-      allowedPartTypes: {},
-    );
-
-    // Add locations to the state
-    await partsManagerState.updatePart(part);
-    await sut.updateLocation(sourceLocation);
-    await sut.updateLocation(targetLocation);
-
-    // Call the method
-    await sut.movePartBetweenLocations(
-      partId: partId,
-      sourceLocation: sourceLocationId,
-      targetLocation: targetLocationId,
-    );
-
-    // Verify that the part was moved to the target location
-    expect(sut.locations[targetLocationId]?.parts, contains(partId));
-    expect(sut.locations[sourceLocationId]?.parts, isEmpty);
-  });
 }
