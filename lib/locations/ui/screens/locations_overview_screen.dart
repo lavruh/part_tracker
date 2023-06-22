@@ -15,17 +15,12 @@ class LocationsOverviewScreen extends StatelessWidget {
         Get.find<LocationManagerState>().toggleLocationSelection(null);
       },
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: const LocationsMenuBarWidget(),
+        ),
         body: const Row(
           children: [
-            Flexible(
-                child: Stack(
-              alignment: AlignmentDirectional.topEnd,
-              children: [
-                LocationsOverviewWidget(),
-                LocationsMenuBarWidget(),
-              ],
-            )),
+            Flexible(child: LocationsOverviewWidget()),
             Flexible(child: PartsOverviewWidget()),
           ],
         ),

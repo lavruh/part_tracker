@@ -19,7 +19,7 @@ class PartsOverviewWidget extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Parts', style: Theme.of(context).textTheme.titleLarge),
+            child: Text('${state.selectedLocation?.name ?? ''} parts', style: Theme.of(context).textTheme.titleLarge),
           ),
           Flexible(
             child: ListView(

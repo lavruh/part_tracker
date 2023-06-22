@@ -33,11 +33,9 @@ class LocationsMenuBarWidget extends StatelessWidget {
             tooltip: 'Delete'),
       ];
 
-      return Card(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: state.isLocationSelected ? editMenu : createMenu,
-        ),
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: state.isLocationSelected ? editMenu : createMenu,
       );
     });
   }
