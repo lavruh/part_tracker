@@ -8,6 +8,7 @@ import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/part_types/domain/part_types_state.dart';
+import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
@@ -19,6 +20,7 @@ import 'parts/domain/entities/part.dart';
 initDependencies() {
   initFakeDB();
   Get.put(PartTypesState());
+  Get.put(PartEditorState());
   Get.put(PartsManagerState());
   Get.put(LocationEditorState());
   Get.put(LocationsMenuState());

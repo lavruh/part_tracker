@@ -13,17 +13,23 @@ class PartsOverviewWidget extends StatelessWidget {
       if (state.selectedLocation == null) {
         return Container();
       }
-      final items = Get.find<PartsManagerState>()
-          .getPartWithIds(state.selectedLocation!.parts);
+      final partsState = Get.find<PartsManagerState>();
+      final items = partsState.getPartWithIds(state.selectedLocation!.parts);
       return Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('${state.selectedLocation?.name ?? ''} parts', style: Theme.of(context).textTheme.titleLarge),
+            child: Text('${state.selectedLocation?.name ?? ''} parts',
+                style: Theme.of(context).textTheme.titleLarge),
           ),
           Flexible(
             child: ListView(
-              children: items.map((e) => PartWidget(item: e)).toList(),
+              children: items
+                  .map((e) => PartWidget(
+                        item: e,
+                        onTap: () => partsState.selectPart(e),
+                      ))
+                  .toList(),
             ),
           ),
         ],

@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 
 class PartWidget extends StatelessWidget {
-  const PartWidget({Key? key, required this.item}) : super(key: key);
+  const PartWidget({Key? key, required this.item, required this.onTap})
+      : super(key: key);
   final Part item;
+  final Function onTap;
 
   @override
   Widget build(BuildContext context) {
     return Draggable(
       data: item,
       feedback: _Child(item: item),
-      child: _Child(item: item),
+      child: InkWell(
+        onTapUp: (_) => onTap(),
+        child: _Child(item: item),
+      ),
     );
   }
 }

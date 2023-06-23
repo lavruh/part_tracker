@@ -7,10 +7,14 @@ import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class PartTypesWidget extends StatelessWidget {
   const PartTypesWidget(
-      {Key? key, required this.selected, required this.updateSelected})
+      {Key? key,
+      required this.selected,
+      required this.updateSelected,
+      this.requestQty = true})
       : super(key: key);
   final Map<UniqueId, int?> selected;
   final Function(Map<UniqueId, int?>) updateSelected;
+  final bool requestQty;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +37,9 @@ class PartTypesWidget extends StatelessWidget {
                         : InputChip(
                             label: Text("${e.name}${_getQty(e.id)}"),
                             selected: _isPartTypeSelected(e.id),
-                            onPressed: () => _showQtyEditDialog(e),
+                            onPressed: () => requestQty
+                                ? _showQtyEditDialog(e)
+                                : _toggleState(e),
                           ),
                   ))
               .toList()
@@ -98,6 +104,15 @@ class PartTypesWidget extends StatelessWidget {
         ));
   }
 
+  void _toggleState(PartType e) {
+    if (selected.containsKey(e.id)) {
+      selected.remove(e.id);
+    } else {
+      selected.putIfAbsent(e.id, () => 0);
+    }
+    updateSelected(selected);
+  }
+
   _showNameEditDialog(
       {required String initName, required Function(String) update}) async {
     final controller = TextEditingController(text: initName);
@@ -118,9 +133,9 @@ class PartTypesWidget extends StatelessWidget {
   }
 
   String _getQty(UniqueId id) {
-    if(!selected.containsKey(id)) return '';
+    if (!selected.containsKey(id)) return '';
     final qty = selected[id];
-    if(qty!=null && qty > 0){
+    if (qty != null && qty > 0) {
       return "\t$qty pcs";
     }
     return '';

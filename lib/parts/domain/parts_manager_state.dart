@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
@@ -8,9 +9,25 @@ class PartsManagerState extends GetxController {
   final parts = <UniqueId, Part>{}.obs;
   final IDbService _db = Get.find();
   final table = 'parts';
+  final _selectedPart = <Part>[].obs;
+  final _editor = Get.find<PartEditorState>();
 
   PartsManagerState() {
     getParts();
+  }
+
+  bool get partSelected => _selectedPart.isNotEmpty;
+
+  selectPart(Part p){
+    _selectedPart.value = [p];
+  }
+
+  deselectPart(){
+    _selectedPart.clear();
+  }
+
+  createPart(){
+    _editor.openEditor();
   }
 
   updatePart(Part part) async {
