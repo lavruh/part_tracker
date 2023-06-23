@@ -18,7 +18,9 @@ class PartsMenuBarWidget extends StatelessWidget {
             : Container()
       ];
       final partEditMenu = <Widget>[
-        IconButton(onPressed: () {}, icon: const Icon(Icons.delete)),
+        IconButton(
+            onPressed: () => state.deleteSelectedPart(),
+            icon: const Icon(Icons.delete)),
       ];
       return Row(
         children: !state.partSelected ? partCreateMenu : partEditMenu,

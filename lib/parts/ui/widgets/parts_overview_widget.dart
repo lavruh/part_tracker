@@ -28,6 +28,7 @@ class PartsOverviewWidget extends StatelessWidget {
                   .map((e) => PartWidget(
                         item: e,
                         onTap: () => partsState.selectPart(e),
+                partSelected: partsState.currentPartSelected(e.partNo),
                       ))
                   .toList(),
             ),

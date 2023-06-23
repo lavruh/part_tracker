@@ -39,6 +39,12 @@ class PartsManagerState extends GetxController {
     parts[part.partNo] = part;
   }
 
+  deleteSelectedPart(){
+    if(partSelected){
+      deletePart(_selectedPart.first.partNo);
+    }
+  }
+
   deletePart(UniqueId part) {
     parts.remove(part);
     _db.delete(id: part.toString(), table: table);
@@ -74,5 +80,12 @@ class PartsManagerState extends GetxController {
         throw Exception('PartNo[$id] does not exists');
       }
     }
+  }
+
+  bool currentPartSelected(UniqueId partNo) {
+    if(partSelected && _selectedPart[0].partNo == partNo){
+      return true;
+    }
+    return false;
   }
 }
