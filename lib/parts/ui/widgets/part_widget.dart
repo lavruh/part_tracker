@@ -16,7 +16,7 @@ class PartWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Draggable(
       data: item,
-      feedback: _Child(item: item, selected: partSelected),
+      feedback: Card(child: _Child(item: item, selected: partSelected)),
       child: InkWell(
         onTapUp: (_) => onTap(),
         child: _Child(item: item, selected: partSelected),

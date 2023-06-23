@@ -188,6 +188,8 @@ class LocationManagerState extends GetxController {
           'Location already has a part of same type');
     }
 
+    await partsManager.updateRemarks(part);
+
     if (sourceLocation != null) {
       final source = locations[sourceLocation];
       if (source != null) {

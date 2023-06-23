@@ -4,6 +4,7 @@ import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/part_types/domain/part_types_state.dart';
 import 'package:part_tracker/part_types/ui/widgets/qty_edit_dialog.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
+import 'package:part_tracker/utils/ui/widgets/text_input_dialog_widget.dart';
 
 class PartTypesWidget extends StatelessWidget {
   const PartTypesWidget(
@@ -115,21 +116,10 @@ class PartTypesWidget extends StatelessWidget {
 
   _showNameEditDialog(
       {required String initName, required Function(String) update}) async {
-    final controller = TextEditingController(text: initName);
-    Get.defaultDialog(
-        title: 'Name:',
-        content: TextFormField(
-          controller: controller,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              update(controller.text);
-              Get.back();
-            },
-            child: const Text('Confirm'),
-          )
-        ]);
+    final text = await textInputDialogWidget(initName: initName);
+    if (text != null) {
+      update(text);
+    }
   }
 
   String _getQty(UniqueId id) {

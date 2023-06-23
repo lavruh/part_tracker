@@ -4,6 +4,7 @@ import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
+import 'package:part_tracker/utils/ui/widgets/text_input_dialog_widget.dart';
 
 class PartsManagerState extends GetxController {
   final parts = <UniqueId, Part>{}.obs;
@@ -18,15 +19,15 @@ class PartsManagerState extends GetxController {
 
   bool get partSelected => _selectedPart.isNotEmpty;
 
-  selectPart(Part p){
+  selectPart(Part p) {
     _selectedPart.value = [p];
   }
 
-  deselectPart(){
+  deselectPart() {
     _selectedPart.clear();
   }
 
-  createPart(){
+  createPart() {
     _editor.openEditor();
   }
 
@@ -39,8 +40,8 @@ class PartsManagerState extends GetxController {
     parts[part.partNo] = part;
   }
 
-  deleteSelectedPart(){
-    if(partSelected){
+  deleteSelectedPart() {
+    if (partSelected) {
       deletePart(_selectedPart.first.partNo);
     }
   }
@@ -83,9 +84,24 @@ class PartsManagerState extends GetxController {
   }
 
   bool currentPartSelected(UniqueId partNo) {
-    if(partSelected && _selectedPart[0].partNo == partNo){
+    if (partSelected && _selectedPart[0].partNo == partNo) {
       return true;
     }
     return false;
+  }
+
+  updateRemarksSelectedPart() async {
+    if (partSelected) {
+      final part = _selectedPart[0];
+      updateRemarks(part);
+    }
+  }
+
+  updateRemarks(Part part) async {
+    final remark =
+        await textInputDialogWidget(title: 'Remarks', initName: part.remarks);
+    if (remark != null) {
+      updatePart(part.copyWith(remarks: remark));
+    }
   }
 }
