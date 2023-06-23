@@ -137,15 +137,29 @@ class LocationManagerState extends GetxController {
     }
   }
 
+  moveNewPartToSelectedLocation({
+    required UniqueId partId,
+  }) async {
+    if (_selectedLocation != null) {
+      try {
+        await movePartBetweenLocations(
+            partId: partId,
+            sourceLocation: null,
+            targetLocation: _selectedLocation!.id);
+      } on LocationManagerException catch (e) {
+        Get.defaultDialog(middleText: e.m);
+      }
+    }
+  }
+
   movePartBetweenLocations({
     required UniqueId partId,
-    required UniqueId sourceLocation,
+    required UniqueId? sourceLocation,
     required UniqueId targetLocation,
   }) async {
     final partsManager = Get.find<PartsManagerState>();
-    final source = locations[sourceLocation];
     final target = locations[targetLocation];
-    if (source == null || target == null) {
+    if (target == null) {
       throw LocationManagerException('Invalid source or target location');
     }
     final parts = partsManager.getPartWithIds([partId]);
@@ -174,11 +188,16 @@ class LocationManagerState extends GetxController {
           'Location already has a part of same type');
     }
 
-    List<UniqueId> tmp = source.parts;
-    tmp.removeWhere((e) => e.id == partId.id);
-    updateLocation(source.copyWith(parts: tmp));
+    if (sourceLocation != null) {
+      final source = locations[sourceLocation];
+      if (source != null) {
+        List<UniqueId> tmp = source.parts;
+        tmp.removeWhere((e) => e.id == partId.id);
+        updateLocation(source.copyWith(parts: tmp));
+      }
+    }
 
-    tmp = target.parts;
+    List<UniqueId> tmp = target.parts;
     tmp.add(partId);
     updateLocation(target.copyWith(parts: tmp));
   }
