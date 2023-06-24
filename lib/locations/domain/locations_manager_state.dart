@@ -11,7 +11,6 @@ class LocationManagerState extends GetxController {
   final locations = <UniqueId, Location>{}.obs;
   final IDbService _db = Get.find();
   final table = 'locations';
-  // Location? _selectedLocation;
   final _menu = Get.find<LocationsMenuState>();
   late TreeController<Location> _treeController;
 
@@ -202,6 +201,18 @@ class LocationManagerState extends GetxController {
     List<UniqueId> tmp = target.parts;
     tmp.add(partId);
     updateLocation(target.copyWith(parts: tmp));
+  }
+
+  deletePartSelectedLocation(UniqueId partId){
+    final location = _selectedLocation;
+    if(location != null){
+      if(!location.parts.contains(partId)){
+        throw LocationManagerException('Cannot delete [$partId] part not found');
+      }
+      List<UniqueId> tmp = location.parts;
+      tmp.remove(partId);
+      updateLocation(location.copyWith(parts: tmp));
+    }
   }
 }
 

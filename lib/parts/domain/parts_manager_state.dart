@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
@@ -48,6 +49,7 @@ class PartsManagerState extends GetxController {
 
   deletePart(UniqueId part) {
     parts.remove(part);
+    Get.find<LocationManagerState>().deletePartSelectedLocation(part);
     _db.delete(id: part.toString(), table: table);
   }
 
