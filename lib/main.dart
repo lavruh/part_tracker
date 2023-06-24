@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:part_tracker/di.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen.dart';
 
-void main() {
-  initDependencies();
+void main() async {
+  await initDependencies();
   runApp(const MyApp());
 }
 

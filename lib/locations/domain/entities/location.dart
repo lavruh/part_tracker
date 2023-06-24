@@ -74,9 +74,10 @@ class Location {
 
   factory Location.fromMap(Map<String, dynamic> map) {
     Map<UniqueId, int?> allowedPT = {};
-    final Map<String, int?> mapAllowedPT = map['allowedPartTypes'];
+    final Map<String, dynamic> mapAllowedPT = map['allowedPartTypes'];
     for (final key in mapAllowedPT .keys) {
-      allowedPT.putIfAbsent(UniqueId.fromMap(key), () => mapAllowedPT[key]);
+      final i = mapAllowedPT[key];
+      allowedPT.putIfAbsent(UniqueId.fromMap(key), () => i);
     }
     // print(map['allowedPartTypes']);
 

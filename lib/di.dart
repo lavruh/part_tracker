@@ -12,13 +12,16 @@ import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
+import 'package:part_tracker/utils/data/sembast_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 import 'parts/domain/entities/part.dart';
 
 @GenerateMocks([IDbService])
-initDependencies() {
-  initFakeDB();
+initDependencies() async {
+  // initFakeDB();
+  final db = Get.put<IDbService>(SembastDbService());
+  await db.init(dbName: 'part_tracker', defaultTable: 'root');
   Get.put(PartTypesState());
   Get.put(PartEditorState());
   Get.put(PartsManagerState());
