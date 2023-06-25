@@ -16,6 +16,7 @@ class PartsOverviewWidget extends StatelessWidget {
       final partsState = Get.find<PartsManagerState>();
       final items = partsState.getPartWithIds(state.selectedLocation!.parts);
       return Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),

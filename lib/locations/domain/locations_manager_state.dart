@@ -2,6 +2,7 @@ import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
+import 'package:part_tracker/logbook/domain/logbook_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
@@ -12,6 +13,7 @@ class LocationManagerState extends GetxController {
   final IDbService _db = Get.find();
   final table = 'locations';
   final _menu = Get.find<LocationsMenuState>();
+  final _logbook = Get.find<LogbookState>();
   late TreeController<Location> _treeController;
 
   LocationManagerState() {
@@ -195,7 +197,12 @@ class LocationManagerState extends GetxController {
         List<UniqueId> tmp = source.parts;
         tmp.removeWhere((e) => e.id == partId.id);
         updateLocation(source.copyWith(parts: tmp));
+        _logbook.addLogEntry(
+            "${part.type} [No. ${part.partNo}] moved from ${source.name} to  ${target.name}");
       }
+    } else {
+      _logbook.addLogEntry(
+          "${part.type} [No. ${part.partNo}] moved to ${target.name}");
     }
 
     List<UniqueId> tmp = target.parts;
@@ -203,11 +210,12 @@ class LocationManagerState extends GetxController {
     updateLocation(target.copyWith(parts: tmp));
   }
 
-  deletePartSelectedLocation(UniqueId partId){
+  deletePartSelectedLocation(UniqueId partId) {
     final location = _selectedLocation;
-    if(location != null){
-      if(!location.parts.contains(partId)){
-        throw LocationManagerException('Cannot delete [$partId] part not found');
+    if (location != null) {
+      if (!location.parts.contains(partId)) {
+        throw LocationManagerException(
+            'Cannot delete [$partId] part not found');
       }
       List<UniqueId> tmp = location.parts;
       tmp.remove(partId);
