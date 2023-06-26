@@ -13,8 +13,9 @@ class LogBookWidget extends StatelessWidget {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Related log entries',
-              style: Theme.of(context).textTheme.titleLarge),
+          if (logbook.isNotEmpty)
+            Text('Related log entries',
+                style: Theme.of(context).textTheme.titleLarge),
           Flexible(
             child: ListView(
               children: logbook.map((e) {

@@ -22,7 +22,7 @@ class LogbookState extends GetxController {
   }
 
   removeLogFilter() {
-    filteredEntries.value = entries;
+    filteredEntries.value = [];
   }
 
   movePartLogEntry(
@@ -65,7 +65,5 @@ class LogbookState extends GetxController {
       final entry = LogEntry.fromMap(map);
       entries.add(entry);
     }
-
-    filteredEntries. value = entries;
   }
 }

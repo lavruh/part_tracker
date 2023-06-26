@@ -35,25 +35,28 @@ class _Child extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = selected ? bold : null;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 125),
-              child: Text(item.type.name, style: style)),
-          ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 125),
-              child: Text('PartNo. ${item.partNo.id}', style: style)),
-          ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 75),
-              child: Text('RH: ${item.runningHours.value}', style: style)),
-          Expanded(
-            child: Text('Remarks: ${item.remarks}',
-                style: style, overflow: TextOverflow.fade),
-          ),
-        ],
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.45),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 125),
+                child: Text(item.type.name, style: style)),
+            ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 125),
+                child: Text('PartNo. ${item.partNo.id}', style: style)),
+            ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 75),
+                child: Text('RH: ${item.runningHours.value}', style: style)),
+            Flexible(
+              child: Text('Remarks: ${item.remarks}',
+                  style: style, overflow: TextOverflow.fade),
+            ),
+          ],
+        ),
       ),
     );
   }

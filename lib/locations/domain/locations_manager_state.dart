@@ -183,11 +183,9 @@ class LocationManagerState extends GetxController {
       throw LocationManagerException(
           'Location already has a part of same type');
     }
-
-    await partsManager.updateRemarks(part);
-    final updatedPart = partsManager.getPartWithIds([partId]).first;
+    Location? source;
     if (sourceLocation != null) {
-      final source = locations[sourceLocation];
+      source = locations[sourceLocation];
       if (source != null) {
         final sourceRhUpdateDate = source.runningHours?.date;
         if (sourceRhUpdateDate != null) {
@@ -200,12 +198,14 @@ class LocationManagerState extends GetxController {
         List<UniqueId> tmp = source.parts;
         tmp.removeWhere((e) => e.id == partId.id);
         updateLocation(source.copyWith(parts: tmp));
-        _logbook.movePartLogEntry(
-            part: updatedPart, target: target, source: source);
       }
-    } else {
-      _logbook.movePartLogEntry(part: updatedPart, target: target);
     }
+
+    await partsManager.updateRemarks(part);
+    final updatedPart = partsManager.getPartWithIds([partId]).first;
+    _logbook.movePartLogEntry(
+        part: updatedPart, target: target, source: source);
+
     List<UniqueId> tmp = target.parts;
     tmp.add(partId);
     updateLocation(target.copyWith(parts: tmp));
@@ -221,10 +221,8 @@ class LocationManagerState extends GetxController {
       List<UniqueId> tmp = location.parts;
       tmp.remove(partId);
       updateLocation(location.copyWith(parts: tmp));
-      _logbook.addLogEntry(
-          'Part no [$partId] deleted from ${location.name}',
-          relatedParts: [partId],
-          relatedLocations: [location.id]);
+      _logbook.addLogEntry('Part no [$partId] deleted from ${location.name}',
+          relatedParts: [partId], relatedLocations: [location.id]);
     }
   }
 }
