@@ -168,12 +168,6 @@ class LocationManagerState extends GetxController {
       throw LocationManagerException('Part not found');
     }
     final part = parts.first;
-    final partRhUpdateDate = part.runningHours.date;
-    final n = DateTime.now();
-    if (partRhUpdateDate.millisecondsSinceEpoch <
-        DateTime(n.year, n.month, n.day).millisecondsSinceEpoch) {
-      throw LocationManagerException('Running hours are not up to date');
-    }
 
     if (!target.allowedPartTypes.containsKey(part.type.id)) {
       throw LocationManagerException(
@@ -190,19 +184,33 @@ class LocationManagerState extends GetxController {
     }
 
     await partsManager.updateRemarks(part);
-
+    final updatedPart = partsManager.getPartWithIds([partId]).first;
     if (sourceLocation != null) {
       final source = locations[sourceLocation];
       if (source != null) {
+        final sourceRhUpdateDate = source.runningHours?.date;
+        if (sourceRhUpdateDate != null) {
+          final n = DateTime.now();
+          if (sourceRhUpdateDate.millisecondsSinceEpoch <
+              DateTime(n.year, n.month, n.day).millisecondsSinceEpoch) {
+            throw LocationManagerException('Running hours are not up to date');
+          }
+        }
         List<UniqueId> tmp = source.parts;
         tmp.removeWhere((e) => e.id == partId.id);
         updateLocation(source.copyWith(parts: tmp));
         _logbook.addLogEntry(
-            "${part.type} [No. ${part.partNo}] moved from ${source.name} to  ${target.name}");
+          "${updatedPart.type.name} [No. ${updatedPart.partNo}] moved from ${source.name} to  ${target.name}. ${updatedPart.remarks}",
+          relatedParts: [partId],
+          relatedLocations: [sourceLocation, targetLocation],
+        );
       }
     } else {
       _logbook.addLogEntry(
-          "${part.type} [No. ${part.partNo}] moved to ${target.name}");
+        "${updatedPart.type.name} [No. ${updatedPart.partNo}] moved to ${target.name}. ${updatedPart.remarks}",
+        relatedParts: [partId],
+        relatedLocations: [targetLocation],
+      );
     }
 
     List<UniqueId> tmp = target.parts;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
 
 class LogBookWidget extends StatelessWidget {
@@ -16,7 +17,16 @@ class LogBookWidget extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge),
           Flexible(
             child: ListView(
-              children: logbook.map((e) => Text(e.toString())).toList(),
+              children: logbook.map((e) {
+                final d = DateFormat('y-MM-dd hh:mm').format(e.date);
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "$d  ${e.entry}",
+                    maxLines: 3,
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ],

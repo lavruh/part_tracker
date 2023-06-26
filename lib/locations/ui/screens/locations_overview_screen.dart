@@ -40,7 +40,7 @@ class LocationsOverviewScreen extends StatelessWidget {
                 SizedBox(
                     height: MediaQuery.of(context).size.height / 2 - 56,
                     width: MediaQuery.of(context).size.width / 2,
-                    child: const Flexible(child: LogBookWidget())),
+                    child: const LogBookWidget()),
               ],
             )
           ],

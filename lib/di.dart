@@ -23,7 +23,8 @@ initDependencies() async {
   // initFakeDB();
   final db = Get.put<IDbService>(SembastDbService());
   await db.init(dbName: 'part_tracker', defaultTable: 'root');
-  Get.put(LogbookState());
+  final log = Get.put(LogbookState());
+  log.getAll();
   Get.put(PartTypesState());
   Get.put(PartEditorState());
   Get.put(PartsManagerState());

@@ -99,7 +99,7 @@ main() {
   });
 
   test("""movePartBetweenLocations should throw exception 
-      if running hours of part updated more then 1 day ago""", () async {
+      if running hours of source location updated more then 1 day ago""", () async {
     final targetLocation = Location(
       id: targetLocationId,
       name: 'Target Location',
