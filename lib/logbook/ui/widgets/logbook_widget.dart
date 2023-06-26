@@ -9,7 +9,7 @@ class LogBookWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final logbook = Get.find<LogbookState>().entries;
+      final logbook = Get.find<LogbookState>().filteredEntries;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [

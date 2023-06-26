@@ -49,7 +49,10 @@ class _Child extends StatelessWidget {
           ConstrainedBox(
               constraints: const BoxConstraints(minWidth: 75),
               child: Text('RH: ${item.runningHours.value}', style: style)),
-          Text('Remarks: ${item.remarks}', style: style),
+          Expanded(
+            child: Text('Remarks: ${item.remarks}',
+                style: style, overflow: TextOverflow.fade),
+          ),
         ],
       ),
     );

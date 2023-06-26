@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
+import 'package:part_tracker/logbook/domain/logbook_state.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
@@ -13,6 +14,7 @@ class PartsManagerState extends GetxController {
   final table = 'parts';
   final _selectedPart = <Part>[].obs;
   final _editor = Get.find<PartEditorState>();
+  final _log = Get.find<LogbookState>();
 
   PartsManagerState() {
     getParts();
@@ -22,6 +24,7 @@ class PartsManagerState extends GetxController {
 
   selectPart(Part p) {
     _selectedPart.value = [p];
+    _log.filterLogByPart(p.partNo);
   }
 
   deselectPart() {

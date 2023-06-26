@@ -38,6 +38,7 @@ class LocationManagerState extends GetxController {
       _menu.toggleMenu(null);
     } else {
       _menu.showMenu(val);
+      _logbook.filterLogByLocation(val.id);
     }
     treeController.rebuild();
   }
@@ -199,20 +200,12 @@ class LocationManagerState extends GetxController {
         List<UniqueId> tmp = source.parts;
         tmp.removeWhere((e) => e.id == partId.id);
         updateLocation(source.copyWith(parts: tmp));
-        _logbook.addLogEntry(
-          "${updatedPart.type.name} [No. ${updatedPart.partNo}] moved from ${source.name} to  ${target.name}. ${updatedPart.remarks}",
-          relatedParts: [partId],
-          relatedLocations: [sourceLocation, targetLocation],
-        );
+        _logbook.movePartLogEntry(
+            part: updatedPart, target: target, source: source);
       }
     } else {
-      _logbook.addLogEntry(
-        "${updatedPart.type.name} [No. ${updatedPart.partNo}] moved to ${target.name}. ${updatedPart.remarks}",
-        relatedParts: [partId],
-        relatedLocations: [targetLocation],
-      );
+      _logbook.movePartLogEntry(part: updatedPart, target: target);
     }
-
     List<UniqueId> tmp = target.parts;
     tmp.add(partId);
     updateLocation(target.copyWith(parts: tmp));
@@ -228,6 +221,10 @@ class LocationManagerState extends GetxController {
       List<UniqueId> tmp = location.parts;
       tmp.remove(partId);
       updateLocation(location.copyWith(parts: tmp));
+      _logbook.addLogEntry(
+          'Part no [$partId] deleted from ${location.name}',
+          relatedParts: [partId],
+          relatedLocations: [location.id]);
     }
   }
 }
