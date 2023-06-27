@@ -8,6 +8,7 @@ import 'package:part_tracker/logbook/ui/widgets/logbook_widget.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/parts/ui/widgets/parts_menu_bar_widget.dart';
 import 'package:part_tracker/parts/ui/widgets/parts_overview_widget.dart';
+import 'package:part_tracker/utils/ui/widgets/drawer_menu_widget.dart';
 
 class LocationsOverviewScreen extends StatelessWidget {
   const LocationsOverviewScreen({Key? key}) : super(key: key);
@@ -25,6 +26,7 @@ class LocationsOverviewScreen extends StatelessWidget {
           title: const LocationsMenuBarWidget(),
           actions: const [PartsMenuBarWidget()],
         ),
+        drawer: const DrawerMenuWidget(),
         body: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -59,4 +59,20 @@ class LogEntry {
   String toString() {
     return 'LogEntry{date: $date, message: $entry}';
   }
+
+  LogEntry copyWith({
+    UniqueId? id,
+    DateTime? date,
+    String? entry,
+    List<UniqueId>? relatedParts,
+    List<UniqueId>? relatedLocations,
+  }) {
+    return LogEntry._internal(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      entry: entry ?? this.entry,
+      relatedParts: relatedParts ?? this.relatedParts,
+      relatedLocations: relatedLocations ?? this.relatedLocations,
+    );
+  }
 }

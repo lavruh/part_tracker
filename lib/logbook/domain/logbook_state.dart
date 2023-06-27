@@ -8,8 +8,22 @@ import 'package:part_tracker/utils/domain/unique_id.dart';
 class LogbookState extends GetxController {
   final entries = <LogEntry>[].obs;
   final filteredEntries = <LogEntry>[].obs;
+  final filteredByTextEntries = <LogEntry>[].obs;
   final IDbService db = Get.find();
   final _tableName = 'logbook';
+
+  showAllLog() {
+    filteredEntries.value = entries;
+  }
+
+  filterLogByText(String text) {
+    if (text.isNotEmpty) {
+      filteredByTextEntries.value =
+          entries.where((e) => e.entry.contains(text)).toList();
+    } else {
+      filteredByTextEntries.value = entries;
+    }
+  }
 
   filterLogByLocation(UniqueId location) {
     filteredEntries.value =
@@ -57,6 +71,7 @@ class LogbookState extends GetxController {
   updateLogEntry(LogEntry entry) {
     entries.removeWhere((e) => e.id == entry.id);
     entries.add(entry);
+    _sortEntries();
     db.update(id: entry.id.toString(), item: entry.toMap(), table: _tableName);
   }
 
@@ -65,5 +80,11 @@ class LogbookState extends GetxController {
       final entry = LogEntry.fromMap(map);
       entries.add(entry);
     }
+    _sortEntries();
+    filteredByTextEntries.value = entries;
+  }
+
+  _sortEntries(){
+    entries.sort((a,b) => b.date.compareTo(a.date));
   }
 }
