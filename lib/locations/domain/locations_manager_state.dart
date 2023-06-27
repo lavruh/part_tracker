@@ -57,7 +57,7 @@ class LocationManagerState extends GetxController {
     }
   }
 
-  void _updateLocationAndSubLocations(Location location) {
+  void _updateLocationAndSubLocations(Location location) async {
     updateLocation(location);
 
     if (location.parts.isNotEmpty && location.runningHours != null) {
