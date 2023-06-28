@@ -23,8 +23,8 @@ class EditorWidget extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async => await _hasToSaveDialog(),
       child: SizedBox(
-        height: 300,
-        width: 500,
+        height: 400,
+        width: 700,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
