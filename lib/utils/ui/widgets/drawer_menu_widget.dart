@@ -17,10 +17,6 @@ class DrawerMenuWidget extends StatelessWidget {
                 Get.defaultDialog(
                     title: 'Logbook', content: const LogBookOverviewWidget());
               }),
-          ListTile(
-              leading: const Icon(Icons.image),
-              title: const Text('View'),
-              onTap: () {}),
         ],
       ),
     );

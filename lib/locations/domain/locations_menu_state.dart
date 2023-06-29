@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
@@ -65,6 +66,16 @@ class LocationsMenuState extends GetxController {
       if (act != null && act) {
         Get.find<LocationManagerState>().deleteLocation(l.id);
       }
+    }
+  }
+
+  showDataOnImgSelectedLocation() {
+    final location = selectedLocation;
+    if (location != null) {
+      final data = Get.find<LocationManagerState>()
+          .getLocationTreeReportData(locationId: location.id);
+      Get.find<DataViewOnImageState>()
+          .showDataViewOnImage(locationId: location.id, data: data);
     }
   }
 }

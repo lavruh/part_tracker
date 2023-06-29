@@ -31,6 +31,10 @@ class LocationsMenuBarWidget extends StatelessWidget {
             onPressed: () => state.deleteSelectedLocation(),
             icon: const Icon(Icons.delete),
             tooltip: 'Delete'),
+        IconButton(
+            onPressed: () => state.showDataOnImgSelectedLocation(),
+            icon: const Icon(Icons.image),
+            tooltip: 'Show report'),
       ];
 
       return Row(

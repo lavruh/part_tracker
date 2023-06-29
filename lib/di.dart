@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
 import 'package:part_tracker/di.mocks.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
@@ -25,6 +26,7 @@ initDependencies() async {
   await db.init(dbName: 'part_tracker', defaultTable: 'root');
   final log = Get.put(LogbookState());
   log.getAll();
+  Get.lazyPut(()=>DataViewOnImageState());
   Get.put(PartTypesState());
   Get.put(PartEditorState());
   Get.put(PartsManagerState());

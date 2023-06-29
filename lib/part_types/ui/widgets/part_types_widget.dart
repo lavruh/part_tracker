@@ -64,20 +64,25 @@ class PartTypesWidget extends StatelessWidget {
             ],
           ),
         ),
-        subtitle: Wrap(
-          direction: Axis.horizontal,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            ...types,
-            if (state.isEditMode)
-              Transform.scale(
-                scale: 0.95,
-                child: InputChip(
-                  label: const Icon(Icons.add),
-                  onPressed: () => state.createPartType(),
-                ),
-              )
-          ],
+        subtitle: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 150),
+          child: SingleChildScrollView(
+            child: Wrap(
+              direction: Axis.horizontal,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ...types,
+                if (state.isEditMode)
+                  Transform.scale(
+                    scale: 0.95,
+                    child: InputChip(
+                      label: const Icon(Icons.add),
+                      onPressed: () => state.createPartType(),
+                    ),
+                  )
+              ],
+            ),
+          ),
         ),
       );
     });

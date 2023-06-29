@@ -225,6 +225,35 @@ class LocationManagerState extends GetxController {
           relatedParts: [partId], relatedLocations: [location.id]);
     }
   }
+
+  Map<String, Map<String, String>> getLocationTreeReportData(
+      {required UniqueId locationId}) {
+    Map<String, Map<String, String>> res = {};
+    final location = locations[locationId];
+    if (location != null) {
+      res.addAll(_getLocationSubTreeReportData(location: location));
+    }
+    return res;
+  }
+
+  Map<String, Map<String, String>> _getLocationSubTreeReportData(
+      {required Location location}) {
+    Map<String, Map<String, String>> res = {};
+    Map<String, String> pMap = {};
+    if (location.parts.isNotEmpty) {
+      final parts =
+          Get.find<PartsManagerState>().getPartWithIds(location.parts);
+      for (final p in parts) {
+        pMap.putIfAbsent(p.type.name, () => p.partNo.toString());
+      }
+    }
+    res.putIfAbsent(location.id.toString(), () => pMap);
+    final subLocations = getSubLocations(location.id);
+    for (final subLocation in subLocations) {
+      res.addAll(_getLocationSubTreeReportData(location: subLocation));
+    }
+    return res;
+  }
 }
 
 class LocationManagerException implements Exception {
