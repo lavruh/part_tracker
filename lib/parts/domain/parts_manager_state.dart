@@ -6,6 +6,7 @@ import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
+import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 import 'package:part_tracker/utils/ui/widgets/text_input_dialog_widget.dart';
 
 class PartsManagerState extends GetxController {
@@ -44,9 +45,12 @@ class PartsManagerState extends GetxController {
     parts[part.partNo] = part;
   }
 
-  deleteSelectedPart() {
+  deleteSelectedPart() async {
     if (partSelected) {
-      deletePart(_selectedPart.first.partNo);
+      final fl = await questionDialogWidget(question: 'Delete part?');
+      if(fl == true) {
+        deletePart(_selectedPart.first.partNo);
+      }
     }
   }
 
