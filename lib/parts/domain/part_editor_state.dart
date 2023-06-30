@@ -59,6 +59,14 @@ class PartEditorState extends GetxController {
     _changed.value = true;
   }
 
+  bool partWithSameNumberExists(String partNo) {
+    final parts = Get.find<PartsManagerState>().getPartWithIds([UniqueId(id: partNo)]);
+    if(parts.isNotEmpty){
+      return true;
+    }
+    return false;
+  }
+
   bool validate() {
     if (formKey.currentState!.validate()) {
       // validate part type

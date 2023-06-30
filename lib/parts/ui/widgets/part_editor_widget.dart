@@ -25,6 +25,9 @@ class PartEditorWidget extends StatelessWidget {
               validator: (v) {
                 if (v == null) return 'Wrong value';
                 if (v.isEmpty) return 'Should not be empty';
+                if (state.partWithSameNumberExists(v)) {
+                  return 'Part with same number exists';
+                }
                 return null;
               },
             ),
@@ -44,9 +47,9 @@ class PartEditorWidget extends StatelessWidget {
                       state.part!.copyWith(runningHours: RunningHours(rh)));
                 }
               },
-              validator: (t){
+              validator: (t) {
                 if (t == null) return 'Wrong value';
-                if(int.tryParse(t) == null) return 'Should be integer';
+                if (int.tryParse(t) == null) return 'Should be integer';
                 return null;
               },
             ),
