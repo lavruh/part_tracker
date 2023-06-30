@@ -55,4 +55,8 @@ class RunningHours {
   RunningHours operator +(RunningHours other) {
     return RunningHours(value + other.value);
   }
+
+  RunningHours operator -(RunningHours other) {
+    return RunningHours(value - other.value);
+  }
 }

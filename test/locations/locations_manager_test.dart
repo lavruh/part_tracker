@@ -6,8 +6,10 @@ import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
+import 'package:part_tracker/logbook/domain/logbook_state.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
@@ -27,8 +29,10 @@ void main() {
     when(dbMock.getAll(table: 'locations'))
         .thenAnswer((_) => const Stream.empty());
     when(dbMock.getAll(table: 'parts')).thenAnswer((_) => const Stream.empty());
+    Get.put(LogbookState());
     Get.put(LocationEditorState());
     Get.put(LocationsMenuState());
+    Get.put(PartEditorState());
     partsManagerState = Get.put(PartsManagerState());
     sut = Get.put(LocationManagerState());
     location = Location.empty(name: 'test location');
@@ -81,14 +85,17 @@ void main() {
   });
 
   test(
-      '''updateLocationRunningHours should update rh of location, sub tree and parts''',
-      () async {
+      '''updateLocationRunningHours should update rh of location, sub tree and parts
+      Parts should be updated with location rh delta''', () async {
     final locationId = UniqueId();
-    final location = Location.empty(name: 'test location');
+    final location = Location.empty(name: 'test location')
+        .copyWith(runningHours: RunningHours(0));
     final partId = UniqueId();
     final part = Part.newPart(partNo: partId, type: PartType.empty());
-    final p2 = part.copyWith(partNo: UniqueId(id: 'p2'));
-    final p3 = part.copyWith(partNo: UniqueId(id: 'p3'));
+    final p2 = part.copyWith(
+        partNo: UniqueId(id: 'p2'), runningHours: RunningHours(3));
+    final p3 = part.copyWith(
+        partNo: UniqueId(id: 'p3'), runningHours: RunningHours(1));
     await partsManagerState.updatePart(part);
     await partsManagerState.updatePart(p2);
     await partsManagerState.updatePart(p3);
@@ -96,15 +103,15 @@ void main() {
     final subLocation1 = location.copyWith(
         id: UniqueId(id: 'sub1'),
         name: 'Sub Location 1',
-        parentLocation: locationId,
-        parts: [p2.partNo]);
-    final subLocation2 =
-        subLocation1.copyWith(id: UniqueId(id: 'sub2'), name: 'Sub Location 2');
+        parentLocation: locationId);
+    final subLocation2 = subLocation1.copyWith(
+        id: UniqueId(id: 'sub2'), name: 'Sub Location 2', parts: [p2.partNo]);
     final subSubLocation2 = subLocation2.copyWith(
         id: UniqueId(id: 'ss2'),
         name: 'ss2',
         parentLocation: subLocation2.id,
-        parts: [p3.partNo]);
+        parts: [p3.partNo],
+        runningHours: RunningHours(5));
     // Add the sub-locations to the state
     sut.updateLocation(subLocation1);
     sut.updateLocation(subLocation2);
@@ -124,6 +131,8 @@ void main() {
         sut.getParentLocation(subLocation2.id).runningHours, RunningHours(10));
     expect(sut.getParentLocation(subSubLocation2.id).runningHours,
         RunningHours(10));
+    expect(partsManagerState.parts[p2.partNo]?.runningHours.value, 13);
+    expect(partsManagerState.parts[p3.partNo]?.runningHours.value, 11);
   });
 
   test(
@@ -197,5 +206,4 @@ void main() {
     expect(location.parts, isA<List<UniqueId>>());
     expect(location.parts, hasLength(2));
   });
-
 }

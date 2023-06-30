@@ -53,17 +53,22 @@ class LocationManagerState extends GetxController {
       final updatedLocation = location.copyWith(
         runningHours: rh,
       );
-      _updateLocationAndSubLocations(updatedLocation);
+      final oldRh = location.runningHours;
+      final newRh = updatedLocation.runningHours;
+      RunningHours? rhDiff = rh ;
+      if(oldRh != null && newRh !=null) {
+        rhDiff = newRh - oldRh;
+      }
+      _updateLocationAndSubLocations(updatedLocation, rhDiff);
     }
   }
 
-  void _updateLocationAndSubLocations(Location location) async {
+  void _updateLocationAndSubLocations(Location location, RunningHours? rhDiff) async {
     updateLocation(location);
 
-    if (location.parts.isNotEmpty && location.runningHours != null) {
-      final RunningHours rh = location.runningHours!;
+    if (location.parts.isNotEmpty && rhDiff != null) {
       Get.find<PartsManagerState>()
-          .updatePartsRunningHours(partIds: location.parts, runningHours: rh);
+          .updatePartsRunningHours(partIds: location.parts, runningHours: rhDiff);
     }
 
     final subLocations = getSubLocations(location.id);
@@ -71,7 +76,7 @@ class LocationManagerState extends GetxController {
       final updatedSubLocation = subLocation.copyWith(
         runningHours: location.runningHours,
       );
-      _updateLocationAndSubLocations(updatedSubLocation);
+      _updateLocationAndSubLocations(updatedSubLocation, rhDiff);
     }
   }
 
