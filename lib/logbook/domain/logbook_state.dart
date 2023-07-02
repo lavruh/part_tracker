@@ -4,6 +4,7 @@ import 'package:part_tracker/logbook/domain/entities/log_entry.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
+import 'package:part_tracker/utils/ui/widgets/text_input_dialog_widget.dart';
 
 class LogbookState extends GetxController {
   final entries = <LogEntry>[].obs;
@@ -40,12 +41,16 @@ class LogbookState extends GetxController {
   }
 
   movePartLogEntry(
-      {required Part part, Location? source, required Location target}) {
+      {required Part part, Location? source, required Location target}) async {
+    final remark = (await textInputDialogWidget(
+            title: 'Transaction remarks', initName: part.remarks)) ??
+        '';
+
     String s = "${part.type.name} [No. ${part.partNo}] moved";
     if (source != null) {
-      s += ' from ${source.name}';
+      s += ' from ${source.id.id}';
     }
-    s += " to  ${target.name}. ${part.remarks}";
+    s += " to  ${target.id.id}. $remark";
     addLogEntry(
       s,
       relatedParts: [part.partNo],
@@ -84,7 +89,7 @@ class LogbookState extends GetxController {
     filteredByTextEntries.value = entries;
   }
 
-  _sortEntries(){
-    entries.sort((a,b) => b.date.compareTo(a.date));
+  _sortEntries() {
+    entries.sort((a, b) => b.date.compareTo(a.date));
   }
 }

@@ -206,14 +206,13 @@ class LocationManagerState extends GetxController {
       }
     }
 
-    await partsManager.updateRemarks(part);
     final updatedPart = partsManager.getPartWithIds([partId]).first;
-    _logbook.movePartLogEntry(
-        part: updatedPart, target: target, source: source);
 
     List<UniqueId> tmp = target.parts;
     tmp.add(partId);
     updateLocation(target.copyWith(parts: tmp));
+    _logbook.movePartLogEntry(
+        part: updatedPart, target: target, source: source);
   }
 
   deletePartSelectedLocation(UniqueId partId) {
