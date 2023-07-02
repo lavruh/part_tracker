@@ -258,6 +258,10 @@ class LocationManagerState extends GetxController {
     }
     return res;
   }
+
+  bool hasLocationWithSameId(UniqueId id) {
+    return locations.containsKey(id);
+  }
 }
 
 class LocationManagerException implements Exception {
