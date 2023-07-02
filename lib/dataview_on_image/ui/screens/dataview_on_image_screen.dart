@@ -12,7 +12,13 @@ class DataViewOnImageScreen extends StatelessWidget {
       final state = Get.find<DataViewOnImageState>();
       final config = state.selectedConfig;
       return Scaffold(
-          appBar: AppBar(),
+          appBar: AppBar(
+            actions: [
+              IconButton(
+                  onPressed: () => state.showDataViewOnImageSettings(),
+                  icon: const Icon(Icons.settings))
+            ],
+          ),
           body: config == null
               ? Container()
               : OverviewScreen(
