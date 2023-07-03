@@ -57,8 +57,9 @@ class LogBookOverviewWidget extends StatelessWidget {
             child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextField(
+            controller: TextEditingController(text: state.textFilter.value),
             onChanged: (val) {
-              state.filterLogByText(val);
+              state.textFilter.value = val;
             },
             decoration: const InputDecoration(labelText: 'Search'),
           ),

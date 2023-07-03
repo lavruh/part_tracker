@@ -60,8 +60,9 @@ class PartEditorState extends GetxController {
   }
 
   bool partWithSameNumberExists(String partNo) {
-    final parts = Get.find<PartsManagerState>().getPartWithIds([UniqueId(id: partNo)]);
-    if(parts.isNotEmpty){
+    final parts =
+        Get.find<PartsManagerState>().getPartWithIds([UniqueId(id: partNo)]);
+    if (parts.isNotEmpty) {
       return true;
     }
     return false;
@@ -90,11 +91,13 @@ class PartEditorState extends GetxController {
       final p = part;
       if (p != null) {
         await Get.find<PartsManagerState>().updatePart(p);
-        Get.find<LocationManagerState>()
+      final success = await Get.find<LocationManagerState>()
             .moveNewPartToSelectedLocation(partId: p.partNo);
-        _changed.value = false;
-        _partType.clear();
-        Get.back();
+       if(success) {
+          _changed.value = false;
+          _partType.clear();
+          Get.back();
+        }
       }
     }
   }

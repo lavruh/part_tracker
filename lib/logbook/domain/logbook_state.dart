@@ -12,6 +12,7 @@ class LogbookState extends GetxController {
   final filteredByTextEntries = <LogEntry>[].obs;
   final IDbService db = Get.find();
   final _tableName = 'logbook';
+  final textFilter = ''.obs;
 
   showAllLog() {
     filteredEntries.value = entries;
@@ -24,6 +25,13 @@ class LogbookState extends GetxController {
     } else {
       filteredByTextEntries.value = entries;
     }
+  }
+
+  @override
+  onInit() {
+    super.onInit();
+    ever(entries, (val) => filterLogByText(textFilter.value));
+    ever(textFilter, (val) => filterLogByText(val));
   }
 
   filterLogByLocation(UniqueId location) {
@@ -40,8 +48,11 @@ class LogbookState extends GetxController {
     filteredEntries.value = [];
   }
 
-  movePartLogEntry(
-      {required Part part, Location? source, required Location target}) async {
+  movePartLogEntry({
+    required Part part,
+    Location? source,
+    required Location target,
+  }) async {
     final remark = (await textInputDialogWidget(
             title: 'Transaction remarks', initName: part.remarks)) ??
         '';

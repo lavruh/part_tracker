@@ -55,20 +55,21 @@ class LocationManagerState extends GetxController {
       );
       final oldRh = location.runningHours;
       final newRh = updatedLocation.runningHours;
-      RunningHours? rhDiff = rh ;
-      if(oldRh != null && newRh !=null) {
+      RunningHours? rhDiff = rh;
+      if (oldRh != null && newRh != null) {
         rhDiff = newRh - oldRh;
       }
       _updateLocationAndSubLocations(updatedLocation, rhDiff);
     }
   }
 
-  void _updateLocationAndSubLocations(Location location, RunningHours? rhDiff) async {
+  void _updateLocationAndSubLocations(
+      Location location, RunningHours? rhDiff) async {
     updateLocation(location);
 
     if (location.parts.isNotEmpty && rhDiff != null) {
-      Get.find<PartsManagerState>()
-          .updatePartsRunningHours(partIds: location.parts, runningHours: rhDiff);
+      Get.find<PartsManagerState>().updatePartsRunningHours(
+          partIds: location.parts, runningHours: rhDiff);
     }
 
     final subLocations = getSubLocations(location.id);
@@ -144,7 +145,7 @@ class LocationManagerState extends GetxController {
     }
   }
 
-  moveNewPartToSelectedLocation({
+  Future<bool> moveNewPartToSelectedLocation({
     required UniqueId partId,
   }) async {
     if (_selectedLocation != null) {
@@ -153,10 +154,13 @@ class LocationManagerState extends GetxController {
             partId: partId,
             sourceLocation: null,
             targetLocation: _selectedLocation!.id);
+        return true;
       } on LocationManagerException catch (e) {
         Get.defaultDialog(middleText: e.m);
+        return false;
       }
     }
+    return false;
   }
 
   movePartBetweenLocations({
@@ -211,7 +215,7 @@ class LocationManagerState extends GetxController {
     List<UniqueId> tmp = target.parts;
     tmp.add(partId);
     updateLocation(target.copyWith(parts: tmp));
-    _logbook.movePartLogEntry(
+    await _logbook.movePartLogEntry(
         part: updatedPart, target: target, source: source);
   }
 
@@ -248,7 +252,8 @@ class LocationManagerState extends GetxController {
       final parts =
           Get.find<PartsManagerState>().getPartWithIds(location.parts);
       for (final p in parts) {
-        pMap.putIfAbsent(p.type.name, () => p.partNo.toString());
+        pMap.putIfAbsent(
+            p.type.name, () => "no:${p.partNo} rh: ${p.runningHours.value}");
       }
     }
     res.putIfAbsent(location.id.toString(), () => pMap);
