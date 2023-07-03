@@ -91,12 +91,14 @@ class PartEditorState extends GetxController {
       final p = part;
       if (p != null) {
         await Get.find<PartsManagerState>().updatePart(p);
-      final success = await Get.find<LocationManagerState>()
+        final success = await Get.find<LocationManagerState>()
             .moveNewPartToSelectedLocation(partId: p.partNo);
-       if(success) {
+        if (success) {
           _changed.value = false;
           _partType.clear();
           Get.back();
+        } else {
+          await Get.find<PartsManagerState>().deletePart(p.partNo);
         }
       }
     }
