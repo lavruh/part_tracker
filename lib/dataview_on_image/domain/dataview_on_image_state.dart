@@ -31,14 +31,18 @@ class DataViewOnImageState extends GetxController {
 
   bool get configSelected => _selectedConfig.isNotEmpty;
 
-  setSelectedConfig(String path) {
-    selectedConfigPath = path;
-    selectedConfig =
-        OverviewScreenConfig.fromJson(File(path).readAsStringSync());
+  setSelectedConfig(String path) async {
+    final file = File(path);
+    if (file.existsSync()) {
+      selectedConfigPath = path;
+      selectedConfig = OverviewScreenConfig.fromJson(file.readAsStringSync());
+    } else {
+      throw Exception('Config file [$path] does not exist');
+    }
   }
 
   addConfig({required String configPath, required UniqueId locationId}) {
-    _configs.putIfAbsent(locationId, () => configPath);
+    _configs[locationId] = configPath;
   }
 
   getConfigs() async {
@@ -60,9 +64,14 @@ class DataViewOnImageState extends GetxController {
     }
     if (_configs.containsKey(locationId)) {
       final path = _configs[locationId] ?? '';
-      setSelectedConfig(path);
-      this.data.value = data;
-      Get.to(() => const DataViewOnImageScreen());
+      try {
+        await setSelectedConfig(path);
+        this.data.value = data;
+        Get.to(() => const DataViewOnImageScreen());
+      } on Exception catch (e) {
+        await Get.defaultDialog(middleText: e.toString());
+        selectConfigFile(locationId);
+      }
     }
   }
 
