@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,11 +11,15 @@ class SembastDbService implements IDbService {
   Database? _db;
 
   @override
-  Future<void> init({required String dbName, required String defaultTable}) async {
+  Future<void> init({required String dbName, String? dbPath}) async {
     try {
-      final appDataPath = await getApplicationDocumentsDirectory();
-      final path = p.join(appDataPath.path, "$dbName.db");
-      _db = await databaseFactoryIo.openDatabase(path);
+      if (dbPath != null && File(dbPath).existsSync()) {
+        _db = await databaseFactoryIo.openDatabase(dbPath);
+      } else {
+        final appDataPath = await getApplicationDocumentsDirectory();
+        final path = p.join(appDataPath.path, "$dbName.db");
+        _db = await databaseFactoryIo.openDatabase(path);
+      }
     } on PlatformException {
       throw Exception('Failed to open DB');
     }

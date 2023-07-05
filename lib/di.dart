@@ -9,18 +9,21 @@ import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/data/sembast_db_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-initDependencies() async {
+Future<bool> initDependencies() async {
+  final pref = Get.put<SharedPreferences>(await SharedPreferences.getInstance());
+  final path = pref.getString('dbPath');
   final db = Get.put<IDbService>(SembastDbService());
-  await db.init(dbName: 'part_tracker', defaultTable: 'root');
+  await db.init(dbName: 'part_tracker', dbPath: path);
   final log = Get.put(LogbookState());
   log.getAll();
-  Get.lazyPut(()=>DataViewOnImageState());
+  Get.lazyPut(() => DataViewOnImageState());
   Get.put(PartTypesState());
   Get.put(PartEditorState());
   Get.put(PartsManagerState());
   Get.put(LocationEditorState());
   Get.put(LocationsMenuState());
   Get.put(LocationManagerState());
+  return true;
 }
-

@@ -1,5 +1,5 @@
 abstract class IDbService {
-  Future<void> init({required String dbName, required String defaultTable});
+  Future<void> init({required String dbName, String? dbPath});
 
   Future<void> update(
       {required String id,
