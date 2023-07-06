@@ -8,6 +8,7 @@ import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_scre
 import 'package:part_tracker/dataview_on_image/ui/widgets/dataview_on_image_settings_widget.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
+import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 
 class DataViewOnImageState extends GetxController {
   final _configs = <UniqueId, String>{}.obs;
@@ -60,7 +61,7 @@ class DataViewOnImageState extends GetxController {
       await getConfigs();
     }
     if (!_configs.containsKey(locationId)) {
-      await selectConfigFile(locationId);
+      await createOrSelectConfig(locationId);
     }
     if (_configs.containsKey(locationId)) {
       final path = _configs[locationId] ?? '';
@@ -126,6 +127,34 @@ class DataViewOnImageState extends GetxController {
     );
     if (f != null) {
       final path = f.paths.first ?? '';
+      addConfig(configPath: path, locationId: locationId);
+      _db.update(id: locationId.id, item: {locationId.id: path}, table: table);
+    }
+  }
+
+  createOrSelectConfig(UniqueId locationId) async {
+    final act = await questionDialogWidget(
+        question:
+            'Config file not found.\n Yes to create new,\n No select existing file.');
+    if (act != null) {
+      if (act) {
+        await _createConfigFile(locationId);
+      } else {
+        await selectConfigFile(locationId);
+      }
+    }
+  }
+
+  Future<void> _createConfigFile(UniqueId locationId) async {
+    final img = await FilePicker.platform.pickFiles(dialogTitle: 'Select image file');
+    final imgPath = img?.files.first.path;
+    if (img == null || imgPath == null) return;
+
+    final conf = OverviewScreenConfig(path: imgPath, viewPorts: {});
+    final path =
+        await FilePicker.platform.saveFile(dialogTitle: 'Save new config');
+    if (path != null) {
+      File(path).writeAsStringSync(conf.toJson());
       addConfig(configPath: path, locationId: locationId);
       _db.update(id: locationId.id, item: {locationId.id: path}, table: table);
     }
