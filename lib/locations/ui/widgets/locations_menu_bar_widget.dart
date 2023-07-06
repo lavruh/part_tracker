@@ -8,8 +8,6 @@ class LocationsMenuBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetX<LocationsMenuState>(builder: (state) {
-      if (state.visible.value == false) return Container();
-
       final createMenu = [
         IconButton(
             onPressed: () => state.openEditor(), icon: const Icon(Icons.add)),

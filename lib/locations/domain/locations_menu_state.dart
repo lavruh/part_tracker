@@ -7,7 +7,6 @@ import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 
 class LocationsMenuState extends GetxController {
-  final visible = false.obs;
   final _editor = Get.find<LocationEditorState>();
   final _selectedLocation = <Location>[].obs;
 
@@ -21,12 +20,10 @@ class LocationsMenuState extends GetxController {
   }
 
   showMenu(Location val) {
-    visible.value = true;
     _selectedLocation.value = [val];
   }
 
   toggleMenu(Location? val) {
-    visible.value = !visible.value;
     if (val != null) {
       _selectedLocation.value = [val];
     } else {

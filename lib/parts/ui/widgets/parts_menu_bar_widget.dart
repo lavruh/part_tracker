@@ -8,7 +8,8 @@ class PartsMenuBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetX<PartsManagerState>(builder: (state) {
+    return Obx(() {
+      final state = Get.find<PartsManagerState>();
       final locationsMenuState = Get.find<LocationsMenuState>();
       final partCreateMenu = <Widget>[
         locationsMenuState.isLocationSelected

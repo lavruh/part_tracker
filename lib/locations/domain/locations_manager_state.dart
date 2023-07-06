@@ -40,6 +40,7 @@ class LocationManagerState extends GetxController {
       _menu.showMenu(val);
       _logbook.filterLogByLocation(val.id);
     }
+    Get.find<PartsManagerState>().deselectPart();
     treeController.rebuild();
   }
 
