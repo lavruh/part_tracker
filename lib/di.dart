@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
@@ -12,7 +13,8 @@ import 'package:part_tracker/utils/data/sembast_db_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> initDependencies() async {
-  final pref = Get.put<SharedPreferences>(await SharedPreferences.getInstance());
+  final pref =
+      Get.put<SharedPreferences>(await SharedPreferences.getInstance());
   final path = pref.getString('dbPath');
   final db = Get.put<IDbService>(SembastDbService());
   await db.init(dbName: 'part_tracker', dbPath: path);
@@ -25,5 +27,8 @@ Future<bool> initDependencies() async {
   Get.put(LocationEditorState());
   Get.put(LocationsMenuState());
   Get.put(LocationManagerState());
+
+  final packageInfo = await PackageInfo.fromPlatform();
+  Get.put<String>(packageInfo.version, tag: 'version');
   return true;
 }

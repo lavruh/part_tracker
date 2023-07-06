@@ -10,9 +10,13 @@ class DrawerMenuWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final v = Get.find<String>(tag: 'version');
     return Drawer(
       child: ListView(
         children: [
+          ListTile(
+            title: Text("Part Tracker   v:$v"),
+          ),
           ListTile(
               leading: const Icon(Icons.book),
               title: const Text('Logbook'),

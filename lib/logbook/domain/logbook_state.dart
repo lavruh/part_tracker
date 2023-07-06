@@ -92,6 +92,7 @@ class LogbookState extends GetxController {
   }
 
   getAll() async {
+    entries.clear();
     await for (final map in db.getAll(table: _tableName)) {
       final entry = LogEntry.fromMap(map);
       entries.add(entry);
