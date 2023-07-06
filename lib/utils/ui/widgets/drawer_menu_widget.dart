@@ -16,6 +16,17 @@ class DrawerMenuWidget extends StatelessWidget {
         children: [
           ListTile(
             title: Text("Part Tracker   v:$v"),
+            trailing: IconButton(
+              icon: const Icon(Icons.info),
+              onPressed: () {
+                showAboutDialog(
+                    context: context,
+                    applicationName: 'Part Tracker',
+                    applicationVersion: v,
+                    applicationLegalese:
+                        'Source code and latest version check at \nhttps://github.com/lavruh/part_tracker');
+              },
+            ),
           ),
           ListTile(
               leading: const Icon(Icons.book),
