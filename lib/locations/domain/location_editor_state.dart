@@ -48,8 +48,11 @@ class LocationEditorState extends GetxController {
 
     if (createMode && locationsManager.hasLocationWithSameId(location.id)) {
       Get.defaultDialog(
-          middleText:
-              'Location with same id exists! Please type another name.');
+          middleText: 'Location with same id exists! Please type another id.');
+      return;
+    }
+    if (location.name.isEmpty) {
+      Get.defaultDialog(middleText: 'Location name can not be empty.');
       return;
     }
     locationsManager.updateLocation(location);
