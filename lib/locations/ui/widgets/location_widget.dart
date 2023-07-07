@@ -11,10 +11,12 @@ class LocationWidget extends StatelessWidget {
     required this.expandCallback,
     required this.selectCallback,
     required this.isSelected,
+    required this.showRunningHours,
     required this.updateRunningHours,
   }) : super(key: key);
   final TreeEntry<Location> entry;
   final bool isSelected;
+  final bool showRunningHours;
   final Function expandCallback;
   final Function selectCallback;
   final Function(RunningHours) updateRunningHours;
@@ -43,7 +45,7 @@ class LocationWidget extends StatelessWidget {
                 : const TextStyle(fontWeight: FontWeight.normal),
           ),
         ),
-        if (entry.node.runningHours != null)
+        if (entry.node.runningHours != null && showRunningHours)
           InkWell(
             onTap: () => _showRhUpdateDialog(context),
             child: Text('   RH: ${entry.node.runningHours}'),

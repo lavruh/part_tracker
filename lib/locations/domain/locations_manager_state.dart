@@ -268,6 +268,17 @@ class LocationManagerState extends GetxController {
   bool hasLocationWithSameId(UniqueId id) {
     return locations.containsKey(id);
   }
+
+  bool showLocationRunningHours(Location l) {
+    final parentId = l.parentLocation;
+    if (parentId != null) {
+      final parent = getParentLocation(parentId);
+      if(parent.runningHours == l.runningHours){
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 class LocationManagerException implements Exception {

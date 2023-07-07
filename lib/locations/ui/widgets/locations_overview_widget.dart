@@ -21,23 +21,25 @@ class LocationsOverviewWidget extends StatelessWidget {
               onAccept: (obj) => _processObj(obj, entry, state),
               builder: (context, _, __) {
                 return LocationWidget(
-                    entry: entry,
-                    expandCallback: () =>
-                        treeController.toggleExpansion(entry.node),
-                    selectCallback: () {
-                      state.toggleLocationSelection(entry.node);
-                    },
-                    updateRunningHours: (val) {
-                      state.updateLocationRunningHours(
-                          locationId: entry.node.id, rh: val);
-                    },
-                    isSelected: state.isLocationSelected(entry.node));
+                  entry: entry,
+                  expandCallback: () =>
+                      treeController.toggleExpansion(entry.node),
+                  selectCallback: () {
+                    state.toggleLocationSelection(entry.node);
+                  },
+                  updateRunningHours: (val) {
+                    state.updateLocationRunningHours(
+                        locationId: entry.node.id, rh: val);
+                  },
+                  isSelected: state.isLocationSelected(entry.node),
+                  showRunningHours: state.showLocationRunningHours(entry.node),
+                );
               },
             );
           });
     });
   }
-  
+
   _processObj(obj, entry, state) {
     if (obj != null && obj.runtimeType == Part) {
       final Part p = obj as Part;
