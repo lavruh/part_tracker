@@ -35,24 +35,24 @@ class LocationsMenuState extends GetxController {
     if (isLocationSelected) {
       _editor.openEditorDialog(_selectedLocation.first);
     } else {
-      _editor.openEditorDialog(Location.empty(name: ''));
+      _editor.openEditorDialog(Location.empty(name: ''), create: true);
     }
   }
 
   duplicateSelectedItem() {
     final l = _selectedLocation.first;
     if (isLocationSelected) {
-      Get.find<LocationManagerState>()
-          .updateLocation(l.copyWith(id: UniqueId(), name: "${l.name}_"));
+      _editor.openEditorDialog(l.copyWith(id: l.id, name: l.name),
+          create: true);
     }
   }
 
   addSubLocation() {
     final l = _selectedLocation.first;
     if (isLocationSelected) {
-      Get.find<LocationManagerState>().updateLocation(
-        Location.empty(name: 'name').copyWith(parentLocation: l.id),
-      );
+      _editor.openEditorDialog(
+          l.copyWith(id: UniqueId(), name: "", parentLocation: l.id),
+          create: true);
     }
   }
 

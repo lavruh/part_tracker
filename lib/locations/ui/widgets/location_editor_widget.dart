@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/part_types/ui/widgets/part_types_widget.dart';
+import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/editor_widget.dart';
 
 class LocationEditorWidget extends StatelessWidget {
@@ -15,6 +16,19 @@ class LocationEditorWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (state.createMode)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextFormField(
+                controller: TextEditingController(
+                    text: state.getLocation.id.toString()),
+                decoration: const InputDecoration(labelText: 'Location ID:'),
+                onFieldSubmitted: (val) {
+                  state.updateLocation(
+                      state.getLocation.copyWith(id: UniqueId(id: val)));
+                },
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextFormField(

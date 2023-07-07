@@ -3,7 +3,6 @@ import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/ui/widgets/location_editor_widget.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
-import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class LocationEditorState extends GetxController {
   final item = <Location>[].obs;
@@ -21,13 +20,12 @@ class LocationEditorState extends GetxController {
     update();
   }
 
-  openEditorDialog(Location l) async {
+  openEditorDialog(Location l, {bool create = false}) async {
     setLocation(l);
     String title = 'Edit location';
-    createMode = false;
-    if (l.name.isEmpty) {
+    createMode = create;
+    if (createMode) {
       title = 'Create location';
-      createMode = true;
     }
     Get.defaultDialog(content: const LocationEditorWidget(), title: title);
   }
@@ -46,9 +44,8 @@ class LocationEditorState extends GetxController {
 
   save() {
     final locationsManager = Get.find<LocationManagerState>();
-    final location = createMode
-        ? getLocation.copyWith(id: UniqueId(id: getLocation.name))
-        : getLocation;
+    final location = getLocation;
+
     if (createMode && locationsManager.hasLocationWithSameId(location.id)) {
       Get.defaultDialog(
           middleText:
