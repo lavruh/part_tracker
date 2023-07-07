@@ -43,12 +43,12 @@ class Location {
     return Location(
       id: id ?? this.id,
       name: name ?? this.name,
-      allowedPartTypes: allowedPartTypes ?? this.allowedPartTypes,
+      allowedPartTypes: allowedPartTypes ?? {...this.allowedPartTypes},
       parentLocation:
           clearParentLocation ? null : parentLocation ?? this.parentLocation,
       runningHours:
           clearRunningHours ? null : runningHours ?? this.runningHours,
-      parts: parts ?? this.parts,
+      parts: parts ?? [...this.parts],
     );
   }
 

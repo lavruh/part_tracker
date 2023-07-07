@@ -40,10 +40,10 @@ class LocationEditorWidget extends StatelessWidget {
             ),
           ),
           PartTypesWidget(
-            selected: state.getLocation.allowedPartTypes,
+            selected: {...state.getLocation.allowedPartTypes},
             updateSelected: (val) {
-              state.updateLocation(
-                  state.getLocation.copyWith(allowedPartTypes: val));
+              final newItem = state.getLocation.copyWith(allowedPartTypes: val);
+              state.updateLocation(newItem);
             },
           ),
           CheckboxListTile(

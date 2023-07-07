@@ -42,8 +42,8 @@ class LocationsMenuState extends GetxController {
   duplicateSelectedItem() {
     final l = _selectedLocation.first;
     if (isLocationSelected) {
-      _editor.openEditorDialog(l.copyWith(id: l.id, name: l.name),
-          create: true);
+      final newItem = l.copyWith(parts: []);
+      _editor.openEditorDialog(newItem, create: true);
     }
   }
 
@@ -51,7 +51,7 @@ class LocationsMenuState extends GetxController {
     final l = _selectedLocation.first;
     if (isLocationSelected) {
       _editor.openEditorDialog(
-          l.copyWith(id: UniqueId(), name: "", parentLocation: l.id),
+          l.copyWith(id: UniqueId(), name: "", parentLocation: l.id, parts: []),
           create: true);
     }
   }
