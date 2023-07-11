@@ -74,8 +74,9 @@ class LogBookOverviewWidget extends StatelessWidget {
     final d = await showDatePicker(
         context: context,
         initialDate: initDate,
-        firstDate: DateTime(initDate.year - 5),
-        lastDate: DateTime(initDate.year + 2));
+        locale: const Locale('en', 'GB'),
+        firstDate: DateTime(initDate.year - 2),
+        lastDate: DateTime(initDate.year + 1));
     if (d != null && context.mounted) {
       final t = await showTimePicker(
         context: context,
