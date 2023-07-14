@@ -48,7 +48,7 @@ class PartsManagerState extends GetxController {
   deleteSelectedPart() async {
     if (partSelected) {
       final fl = await questionDialogWidget(question: 'Delete part?');
-      if(fl == true) {
+      if (fl == true) {
         deletePart(_selectedPart.first.partNo);
       }
     }
@@ -82,12 +82,17 @@ class PartsManagerState extends GetxController {
     required RunningHours runningHours,
   }) {
     for (final id in partIds) {
-      final item = parts[id];
-      if (item != null) {
+      try {
+        final item = getPart(id: id);
         final partRh = item.runningHours;
-        updatePart(item.copyWith(runningHours: partRh + runningHours));
-      } else {
-        throw Exception('PartNo[$id] does not exists');
+        final partRhSinceInstall = item.runningHoursAtLocation;
+        updatePart(item.copyWith(
+          runningHours: partRh + runningHours,
+          runningHoursAtLocation: partRhSinceInstall + runningHours,
+        ));
+      } on Exception catch (e) {
+        print(e);
+        rethrow;
       }
     }
   }
@@ -112,5 +117,18 @@ class PartsManagerState extends GetxController {
     if (remark != null) {
       updatePart(part.copyWith(remarks: remark));
     }
+  }
+
+  RunningHours clearPartCurrentRunningHours(UniqueId partId) {
+    final part = getPart(id: partId);
+    final rhSpendOnLocation = part.runningHoursAtLocation;
+    updatePart(part.copyWith(runningHoursAtLocation: RunningHours(0)));
+    return rhSpendOnLocation;
+  }
+
+  Part getPart({required UniqueId id}) {
+    final part = parts[id];
+    if (part == null) throw Exception('PartNo[$id] does not exists');
+    return part;
   }
 }

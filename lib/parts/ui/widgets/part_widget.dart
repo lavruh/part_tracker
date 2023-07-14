@@ -36,7 +36,8 @@ class _Child extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = selected ? bold : null;
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.45),
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.45),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -47,13 +48,17 @@ class _Child extends StatelessWidget {
                 child: Text(item.type.name, style: style)),
             ConstrainedBox(
                 constraints: const BoxConstraints(minWidth: 125),
-                child: Text('PartNo. ${item.partNo.id}', style: style)),
+                child: Text(item.partNo.id, style: style)),
             ConstrainedBox(
                 constraints: const BoxConstraints(minWidth: 75),
-                child: Text('RH: ${item.runningHours.value}', style: style)),
+                child: Text('${item.runningHours.value}', style: style)),
+            ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 75),
+                child: Text('${item.runningHoursAtLocation.value}',
+                    style: style)),
             Flexible(
-              child: Text('Remarks: ${item.remarks}',
-                  style: style, overflow: TextOverflow.fade),
+              child:
+                  Text(item.remarks, style: style, overflow: TextOverflow.fade),
             ),
           ],
         ),

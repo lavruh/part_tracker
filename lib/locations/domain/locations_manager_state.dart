@@ -194,6 +194,7 @@ class LocationManagerState extends GetxController {
           'Location already has a part of same type');
     }
     Location? source;
+    RunningHours? rhSpendOnLocation;
     if (sourceLocation != null) {
       source = locations[sourceLocation];
       if (source != null) {
@@ -208,6 +209,9 @@ class LocationManagerState extends GetxController {
         List<UniqueId> tmp = source.parts;
         tmp.removeWhere((e) => e.id == partId.id);
         updateLocation(source.copyWith(parts: tmp));
+        if (source.runningHours != null) {
+          rhSpendOnLocation = partsManager.clearPartCurrentRunningHours(partId);
+        }
       }
     }
 
@@ -217,7 +221,11 @@ class LocationManagerState extends GetxController {
     tmp.add(partId);
     updateLocation(target.copyWith(parts: tmp));
     await _logbook.movePartLogEntry(
-        part: updatedPart, target: target, source: source);
+      part: updatedPart,
+      target: target,
+      source: source,
+      runningHoursSpentOnLocation: rhSpendOnLocation,
+    );
   }
 
   deletePartSelectedLocation(UniqueId partId) {
@@ -273,7 +281,7 @@ class LocationManagerState extends GetxController {
     final parentId = l.parentLocation;
     if (parentId != null) {
       final parent = getParentLocation(parentId);
-      if(parent.runningHours == l.runningHours){
+      if (parent.runningHours == l.runningHours) {
         return false;
       }
     }

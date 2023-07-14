@@ -35,7 +35,10 @@ class RunningHours {
   @override
   int get hashCode => value.hashCode;
 
-  factory RunningHours.fromMap(Map<String, dynamic> map) {
+  factory RunningHours.fromMap(Map<String, dynamic>? map) {
+    if(map == null){
+      return RunningHours(0);
+    }
     return RunningHours._constructor(
       value: map['value'] as int,
       date: DateTime.fromMillisecondsSinceEpoch(map['date']),

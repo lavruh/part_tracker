@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/logbook/domain/entities/log_entry.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/text_input_dialog_widget.dart';
@@ -48,11 +49,11 @@ class LogbookState extends GetxController {
     filteredEntries.value = [];
   }
 
-  movePartLogEntry({
-    required Part part,
-    Location? source,
-    required Location target,
-  }) async {
+  movePartLogEntry(
+      {required Part part,
+      Location? source,
+      required Location target,
+      RunningHours? runningHoursSpentOnLocation}) async {
     final remark = (await textInputDialogWidget(
             title: 'Transaction remarks', initName: part.remarks)) ??
         '';
@@ -61,7 +62,11 @@ class LogbookState extends GetxController {
     if (source != null) {
       s += ' from ${source.id.id}';
     }
-    s += " to  ${target.id.id}. $remark";
+    s += " to  ${target.id.id}.";
+    if (runningHoursSpentOnLocation != null) {
+      s += " after ${runningHoursSpentOnLocation.value} hours.";
+    }
+    s += " $remark";
     addLogEntry(
       s,
       relatedParts: [part.partNo],

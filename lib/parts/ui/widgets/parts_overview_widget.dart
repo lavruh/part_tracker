@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/parts/ui/widgets/part_widget.dart';
+import 'package:part_tracker/parts/ui/widgets/parts_header_widget.dart';
 
 class PartsOverviewWidget extends StatelessWidget {
   const PartsOverviewWidget({Key? key}) : super(key: key);
@@ -25,13 +26,14 @@ class PartsOverviewWidget extends StatelessWidget {
           ),
           Flexible(
             child: ListView(
-              children: items
-                  .map((e) => PartWidget(
-                        item: e,
-                        onTap: () => partsState.selectPart(e),
-                partSelected: partsState.currentPartSelected(e.partNo),
-                      ))
-                  .toList(),
+              children: [
+                const PartsHeaderWidget(),
+                ...items.map((e) => PartWidget(
+                      item: e,
+                      onTap: () => partsState.selectPart(e),
+                      partSelected: partsState.currentPartSelected(e.partNo),
+                    ))
+              ],
             ),
           ),
         ],
