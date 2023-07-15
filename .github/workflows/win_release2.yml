@@ -1,0 +1,31 @@
+name: win release v2
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: flutter release v2
+    runs-on: windows-latest
+    steps:
+        - uses: actions/checkout@v3
+        - name: Get Flutter version
+          id: get-flutter-version
+          uses: zgosalvez/github-actions-get-flutter-version-env@v2
+        - uses: subosito/flutter-action@v2
+          with:
+            channel: 'stable'
+            flutter-version: '3.10.5'
+        - name: Install project dependencies
+          run: flutter pub get
+        - name: Generate intermediates
+          run: flutter pub run build_runner build --delete-conflicting-outputs
+        - name: Enable windows build
+          run: flutter config --enable-windows-desktop
+        - name: Build artifacts
+          run: flutter build windows --release
+        - name: Archive Release
+          uses: thedoctor0/zip-release@master
+          with:
+            type: 'zip'
+            filename: PartTracker-${{github.ref_name}}-windows-${{steps.get-flutter-version.outputs.version}}.zip
+            directory: build/windows/runner/Release
+       
