@@ -13,22 +13,26 @@ import 'package:part_tracker/utils/data/sembast_db_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> initDependencies() async {
-  final pref =
-      Get.put<SharedPreferences>(await SharedPreferences.getInstance());
-  final path = pref.getString('dbPath');
-  final db = Get.put<IDbService>(SembastDbService());
-  await db.init(dbName: 'part_tracker', dbPath: path);
-  final log = Get.put(LogbookState());
-  log.getAll();
-  Get.lazyPut(() => DataViewOnImageState());
-  Get.put(PartTypesState());
-  Get.put(PartEditorState());
-  Get.put(PartsManagerState());
-  Get.put(LocationEditorState());
-  Get.put(LocationsMenuState());
-  Get.put(LocationManagerState());
+  try {
+    final pref =
+        Get.put<SharedPreferences>(await SharedPreferences.getInstance());
+    final path = pref.getString('dbPath');
+    final db = Get.put<IDbService>(SembastDbService());
+    await db.init(dbName: 'part_tracker', dbPath: path);
+    final log = Get.put(LogbookState());
+    log.getAll();
+    Get.lazyPut(() => DataViewOnImageState());
+    Get.put(PartTypesState());
+    Get.put(PartEditorState());
+    Get.put(PartsManagerState());
+    Get.put(LocationEditorState());
+    Get.put(LocationsMenuState());
+    Get.put(LocationManagerState());
 
-  final packageInfo = await PackageInfo.fromPlatform();
-  Get.put<String>(packageInfo.version, tag: 'version');
+    final packageInfo = await PackageInfo.fromPlatform();
+    Get.put<String>(packageInfo.version, tag: 'version');
+  } catch (e) {
+    Get.defaultDialog(middleText: '$e');
+  }
   return true;
 }
