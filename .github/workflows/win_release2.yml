@@ -10,7 +10,7 @@ jobs:
         - id: read-version
           uses: NiklasLehnfeld/flutter-version-number-action@main
           with:
-            file-path: ${{github.ref_name}}/pubspec.yaml
+            file-path: pubspec.yaml
         - uses: subosito/flutter-action@v2
           with:
             channel: 'stable'
