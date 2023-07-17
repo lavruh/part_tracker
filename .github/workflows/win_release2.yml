@@ -34,3 +34,7 @@ jobs:
           with:
             name: PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
             path: build/windows/runner/Release/PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
+        - name: Release
+          uses: softprops/action-gh-release@v1
+          with:
+            files: build/windows/runner/Release/PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
