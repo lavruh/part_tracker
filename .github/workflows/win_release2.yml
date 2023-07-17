@@ -29,11 +29,6 @@ jobs:
             type: 'zip'
             filename: PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
             directory: build/windows/runner/Release
-        - name: Windows Release
-          uses: actions/upload-artifact@v1
-          with:
-            name: PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
-            path: build/windows/runner/Release/PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
         - name: Release
           uses: softprops/action-gh-release@v1
           with:
