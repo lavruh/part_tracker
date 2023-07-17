@@ -4,13 +4,11 @@ import 'package:part_tracker/di.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen.dart';
 
 void main() async {
-  runApp(const RestartWidget(child: MyApp()));
+  runApp(const RestartWidget());
 }
 
 class RestartWidget extends StatefulWidget {
-  const RestartWidget({Key? key, required this.child}) : super(key: key);
-
-  final Widget child;
+  const RestartWidget({Key? key}) : super(key: key);
 
   static void restartApp(BuildContext context) {
     context.findAncestorStateOfType<_RestartWidgetState>()?.restartApp();
@@ -35,26 +33,25 @@ class _RestartWidgetState extends State<RestartWidget> {
         key: key,
         future: initDependencies(),
         builder: (context, _) {
+          Widget child = const Center(child: CircularProgressIndicator());
           final loaded = _.data;
-          if (loaded == null || loaded == false) {
-            return const Center(child: CircularProgressIndicator());
+          if (_.hasError) {
+            final errString = _.error.toString();
+            child = Scaffold(body: Center(child: Text(errString)));
           }
-          return KeyedSubtree(child: widget.child);
+          if (loaded != null && loaded == true) {
+            child = const LocationsOverviewScreen();
+          }
+
+          return KeyedSubtree(
+            child: GetMaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                primarySwatch: Colors.grey,
+              ),
+              home: child,
+            ),
+          );
         });
-  }
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.grey,
-      ),
-      home: const LocationsOverviewScreen(),
-    );
   }
 }

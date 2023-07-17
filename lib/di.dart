@@ -32,7 +32,7 @@ Future<bool> initDependencies() async {
     final packageInfo = await PackageInfo.fromPlatform();
     Get.put<String>(packageInfo.version, tag: 'version');
   } catch (e) {
-    Get.defaultDialog(middleText: '$e');
+    rethrow;
   }
   return true;
 }
