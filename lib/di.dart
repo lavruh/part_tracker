@@ -17,6 +17,9 @@ Future<bool> initDependencies() async {
     final pref =
         Get.put<SharedPreferences>(await SharedPreferences.getInstance());
     final path = pref.getString('dbPath');
+    if (path == null) {
+      throw Exception('No db selected');
+    }
     final db = Get.put<IDbService>(SembastDbService());
     await db.init(dbName: 'part_tracker', dbPath: path);
     final log = Get.put(LogbookState());

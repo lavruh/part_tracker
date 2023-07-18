@@ -1,9 +1,7 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/logbook/ui/widgets/logbook_overview_widget.dart';
-import 'package:part_tracker/main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
 
 class DrawerMenuWidget extends StatelessWidget {
   const DrawerMenuWidget({Key? key}) : super(key: key);
@@ -38,27 +36,11 @@ class DrawerMenuWidget extends StatelessWidget {
           ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Set app db file'),
-              onTap: () => _setAppDB(context)),
+              onTap: () => setAppDB(context)),
         ],
       ),
     );
   }
 
-  _setAppDB(BuildContext context) async {
-    final cont = context;
-    final pref = Get.find<SharedPreferences>();
-    final f = await FilePicker.platform
-        .pickFiles(dialogTitle: 'Select db', allowedExtensions: ['db']);
-    if (f != null) {
-      final path = f.files.first.path;
-      if (path != null) {
-        pref.setString('dbPath', path);
-        Get.defaultDialog(
-            title: '', middleText: 'To apply changes restart app');
-        if (cont.mounted) {
-          RestartWidget.restartApp(cont);
-        }
-      }
-    }
-  }
+
 }

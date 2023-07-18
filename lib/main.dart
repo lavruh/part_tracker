@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/di.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen.dart';
+import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
 
 void main() async {
   runApp(const RestartWidget());
@@ -37,6 +38,9 @@ class _RestartWidgetState extends State<RestartWidget> {
           final loaded = _.data;
           if (_.hasError) {
             final errString = _.error.toString();
+            if (errString.contains('No db')) {
+              setAppDB(context);
+            }
             child = Scaffold(body: Center(child: Text(errString)));
           }
           if (loaded != null && loaded == true) {
