@@ -33,7 +33,6 @@ jobs:
           uses: softprops/action-gh-release@v1
           with:
             tag_name: stable
-            body_path: ${{ github.workspace }}build/windows/runner/Release/PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
-            token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+            files: build/windows/runner/Release/PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
           env:
-             GITHUB_REPOSITORY: lavruh/part_tracker
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
