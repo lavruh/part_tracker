@@ -32,12 +32,7 @@ jobs:
         - name: Release
           uses: softprops/action-gh-release@v1
           with:
-            tag_name: stable
+            tag_name: PartTracker-win-${{steps.read-version.outputs.version-number}}
             files: build/windows/runner/Release/PartTracker-${{github.ref_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        - name: Windows Release
-          uses: actions/upload-artifact@v1
-          with:
-            name: PartTracker-${{github.ref_name}}-windows
-            path: build/windows/runner/Release/PartTracker-${{github.ref_name}}-windows.zip
