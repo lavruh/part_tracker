@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/domain/view_port.dart';
+import 'package:data_on_image_view/ui/screens/editor_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_screen.dart';
@@ -76,6 +77,13 @@ class DataViewOnImageState extends GetxController {
     }
   }
 
+  showConfigEditor() {
+    final config = selectedConfig;
+    if (config != null) {
+      Get.to(() => EditorScreen(config: config));
+    }
+  }
+
   showDataViewOnImageSettings() {
     Get.defaultDialog(
         content: const DataViewOnImageSettingsWidget(), title: '');
@@ -146,7 +154,8 @@ class DataViewOnImageState extends GetxController {
   }
 
   Future<void> _createConfigFile(UniqueId locationId) async {
-    final img = await FilePicker.platform.pickFiles(dialogTitle: 'Select image file');
+    final img =
+        await FilePicker.platform.pickFiles(dialogTitle: 'Select image file');
     final imgPath = img?.files.first.path;
     if (img == null || imgPath == null) return;
 

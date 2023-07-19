@@ -15,9 +15,12 @@ class DataViewOnImageSettingsWidget extends StatelessWidget {
         children: [
           ListTile(
             leading: const Text('Config file:'),
-            title: Text(state.selectedConfigPath),
+            title: TextButton(
+              onPressed: () => _selectConfigFile(state),
+              child: Text(state.selectedConfigPath),
+            ),
             trailing: IconButton(
-                onPressed: () => _selectConfigFile(state),
+                onPressed: () => state.showConfigEditor(),
                 icon: const Icon(Icons.edit)),
           ),
           ListTile(
