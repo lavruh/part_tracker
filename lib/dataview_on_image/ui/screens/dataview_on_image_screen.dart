@@ -24,6 +24,7 @@ class DataViewOnImageScreen extends StatelessWidget {
               : OverviewScreen(
                   config: config,
                   data: state.data,
+                  useMenu: false,
                 ));
     });
   }

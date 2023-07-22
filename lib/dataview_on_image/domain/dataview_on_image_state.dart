@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/domain/view_port.dart';
-import 'package:data_on_image_view/ui/screens/editor_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
+import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_editor.dart';
 import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_screen.dart';
 import 'package:part_tracker/dataview_on_image/ui/widgets/dataview_on_image_settings_widget.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
@@ -80,7 +80,7 @@ class DataViewOnImageState extends GetxController {
   showConfigEditor() {
     final config = selectedConfig;
     if (config != null) {
-      Get.to(() => EditorScreen(config: config));
+      Get.to(() => const DataViewOnImageEditor());
     }
   }
 
@@ -167,5 +167,9 @@ class DataViewOnImageState extends GetxController {
       addConfig(configPath: path, locationId: locationId);
       _db.update(id: locationId.id, item: {locationId.id: path}, table: table);
     }
+  }
+
+  void reloadConfigFile() async {
+    await setSelectedConfig(selectedConfigPath);
   }
 }

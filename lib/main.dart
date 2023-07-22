@@ -22,8 +22,8 @@ class RestartWidget extends StatefulWidget {
 class _RestartWidgetState extends State<RestartWidget> {
   Key key = UniqueKey();
 
-  void restartApp() {
-    Get.deleteAll();
+  void restartApp() async {
+    await Get.deleteAll();
     key = UniqueKey();
     setState(() {});
   }
