@@ -190,10 +190,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: b63b6e799b07d734097660a20d0eb014020e80ed
+      resolved-ref: "380a168e38b900e72a8bded4145beb3c9835cf2e"
       url: "https://github.com/lavruh/data_on_image_view.git"
     source: git
-    version: "1.0.9+1"
+    version: "1.0.10+1"
   fake_async:
     dependency: transitive
     description:
