@@ -11,12 +11,25 @@ class DataViewOnImageEditor extends StatelessWidget {
     return Obx(() {
       final state = Get.find<DataViewOnImageState>();
       final config = state.selectedConfig;
+
+      Widget child = const CircularProgressIndicator();
+      if (config != null) {
+        try {
+          child = EditorScreen(
+            config: config,
+            useBackButton: false,
+          );
+        } catch (e) {
+          child = Text(e.toString());
+        }
+      }
+
       return WillPopScope(
-        onWillPop: () async {
-          state.reloadConfigFile();
-          return true;
-        },
-        child: Scaffold(
+          onWillPop: () async {
+            state.reloadConfigFile();
+            return true;
+          },
+          child: Scaffold(
             appBar: AppBar(
               actions: [
                 IconButton(
@@ -24,13 +37,8 @@ class DataViewOnImageEditor extends StatelessWidget {
                     icon: const Icon(Icons.settings))
               ],
             ),
-            body: config == null
-                ? Container()
-                : EditorScreen(
-                    config: config,
-                    useBackButton: false,
-                  )),
-      );
+            body: child,
+          ));
     });
   }
 }
