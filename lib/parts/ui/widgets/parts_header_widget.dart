@@ -24,7 +24,7 @@ class PartsHeaderWidget extends StatelessWidget {
                 child: const Text('RH Total:', style: style)),
             ConstrainedBox(
                 constraints: const BoxConstraints(minWidth: 75),
-                child: const Text('RH @ Location:', style: style)),
+                child: const Text('RH     @\n Location:', style: style)),
             const Flexible(
               child: Text('Remarks:',
                   style: style, overflow: TextOverflow.fade),
