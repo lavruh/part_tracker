@@ -27,7 +27,14 @@ class PartsMenuBarWidget extends StatelessWidget {
             icon: const Icon(Icons.delete)),
       ];
       return Row(
-        children: !state.partSelected ? partCreateMenu : partEditMenu,
+        children: [
+          IconButton(
+              onPressed: () => state.showSearchDialog(),
+              icon: const Icon(Icons.search),
+              tooltip: 'Search part'),
+          ...partCreateMenu,
+          if (state.partSelected) ...partEditMenu,
+        ],
       );
     });
   }
