@@ -7,6 +7,7 @@ import 'package:part_tracker/parts/ui/widgets/parts_header_widget.dart';
 
 class PartsOverviewWidget extends StatelessWidget {
   const PartsOverviewWidget({Key? key}) : super(key: key);
+  final double partWidgetHeight = 50;
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,13 @@ class PartsOverviewWidget extends StatelessWidget {
       }
       final partsState = Get.find<PartsManagerState>();
       final items = partsState.getPartWithIds(state.selectedLocation!.parts);
+      final selectedPart = partsState.selectedPart;
+      double itemIndex = 0;
+      if (selectedPart != null) {
+        itemIndex = items.indexOf(selectedPart).toDouble();
+      }
+      final scrollController =ScrollController(
+          initialScrollOffset: itemIndex * partWidgetHeight);
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -24,14 +32,17 @@ class PartsOverviewWidget extends StatelessWidget {
             child: Text('${state.selectedLocation?.name ?? ''} parts',
                 style: Theme.of(context).textTheme.titleLarge),
           ),
+          const PartsHeaderWidget(),
           Flexible(
             child: ListView(
+              key: Key(itemIndex.toString()),
+              controller: scrollController,
               children: [
-                const PartsHeaderWidget(),
                 ...items.map((e) => PartWidget(
                       item: e,
                       onTap: () => partsState.selectPart(e),
                       partSelected: partsState.currentPartSelected(e.partNo),
+                      widgetMaxHeight: partWidgetHeight,
                     ))
               ],
             ),

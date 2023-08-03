@@ -287,6 +287,18 @@ class LocationManagerState extends GetxController {
     }
     return true;
   }
+
+  selectLocationContainingPart({required UniqueId partId}) {
+    try {
+      final location = locations.values
+          .firstWhere((location) => location.parts.contains(partId));
+      toggleLocationSelection(location);
+      _expandTillSelected();
+    }
+    on StateError catch(_){
+      Get.defaultDialog(title: '', middleText: 'No Location containing [$partId] found');
+    }
+  }
 }
 
 class LocationManagerException implements Exception {

@@ -3,6 +3,7 @@ import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/parts/domain/part_editor_state.dart';
+import 'package:part_tracker/parts/ui/widgets/parts_search_dialog.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
@@ -16,12 +17,19 @@ class PartsManagerState extends GetxController {
   final _selectedPart = <Part>[].obs;
   final _editor = Get.find<PartEditorState>();
   final _log = Get.find<LogbookState>();
+  final foundPartsIds = <Part>[].obs;
 
   PartsManagerState() {
     getParts();
   }
 
   bool get partSelected => _selectedPart.isNotEmpty;
+  Part? get selectedPart {
+    if (_selectedPart.isNotEmpty) {
+      return _selectedPart.first;
+    }
+    return null;
+  }
 
   selectPart(Part p) {
     _selectedPart.value = [p];
@@ -90,8 +98,7 @@ class PartsManagerState extends GetxController {
           runningHours: partRh + runningHours,
           runningHoursAtLocation: partRhSinceInstall + runningHours,
         ));
-      } on Exception catch (e) {
-        print(e);
+      } on Exception catch (_) {
         rethrow;
       }
     }
@@ -130,5 +137,21 @@ class PartsManagerState extends GetxController {
     final part = parts[id];
     if (part == null) throw Exception('PartNo[$id] does not exists');
     return part;
+  }
+
+  showSearchDialog() async {
+    Get.defaultDialog(title: "Part Search", content: const PartsSearchDialog());
+  }
+
+  searchPart(String partNoStr) {
+    foundPartsIds.value = parts.values
+        .where((part) => part.partNo.id.contains(partNoStr))
+        .toList();
+  }
+
+  selectFoundPart(Part p) {
+    Get.find<LocationManagerState>()
+        .selectLocationContainingPart(partId: p.partNo);
+    selectPart(p);
   }
 }
