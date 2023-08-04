@@ -4,10 +4,10 @@ App for managing staus of various equipment parts:
 - logging events
 - tracking parts location.
 
-  Build from source:
-  Install Flutter latest
-  Flutter pub get
-  Flutter run
-  Enjoy
+#Build from source:
+* Install Flutter latest
+* Flutter pub get
+* Flutter run
+* Enjoy
 
-  Tested on Linux and Windows10
+ Tested on Linux and Windows10
