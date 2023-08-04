@@ -1,16 +1,13 @@
 # part_tracker
+App for managing staus of various equipment parts:
+- calculation of part running hours
+- logging events
+- tracking parts location.
 
-A new Flutter project.
+  Build from source:
+  Install Flutter latest
+  Flutter pub get
+  Flutter run
+  Enjoy
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  Tested on Linux and Windows10
