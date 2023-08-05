@@ -9,13 +9,29 @@ class LogBookWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final logbook = Get.find<LogbookState>().filteredEntries;
+      final state = Get.find<LogbookState>();
+      final logbook = state.filteredEntries;
+      List<Widget> header = [];
+      if (logbook.isNotEmpty) {
+        header = [
+          Text('Related log entries',
+              style: Theme.of(context).textTheme.titleLarge),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: () => state.addLogEntryToLocation(),
+                icon: const Icon(Icons.add),
+                tooltip: "Add log entry",
+              )
+            ],
+          ),
+        ];
+      }
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (logbook.isNotEmpty)
-            Text('Related log entries',
-                style: Theme.of(context).textTheme.titleLarge),
+          ...header,
           Flexible(
             child: ListView(
               children: logbook.map((e) {
