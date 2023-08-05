@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
+import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/logbook/domain/entities/log_entry.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
@@ -72,6 +74,26 @@ class LogbookState extends GetxController {
       relatedParts: [part.partNo],
       relatedLocations: [target.id, if (source != null) source.id],
     );
+  }
+
+  addLogEntryToLocation() async {
+    final location = Get.find<LocationsMenuState>().selectedLocation;
+    if (location != null) {
+      final part = Get.find<PartsManagerState>().selectedPart;
+      String logText = location.name;
+      if (location.runningHours != null) {
+        logText += '@${location.runningHours?.value}Hrs.';
+      }
+      if (part != null) {
+        logText += '${part.type.name}[${part.partNo}]';
+      }
+      final entry = await textInputDialogWidget(initName: logText);
+      if (entry != null) {
+        addLogEntry(entry,
+            relatedParts: [if (part != null) part.partNo],
+            relatedLocations: [location.id]);
+      }
+    }
   }
 
   addLogEntry(
