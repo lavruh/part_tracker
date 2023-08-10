@@ -7,7 +7,6 @@ import 'package:part_tracker/parts/ui/widgets/parts_header_widget.dart';
 
 class PartsOverviewWidget extends StatelessWidget {
   const PartsOverviewWidget({Key? key}) : super(key: key);
-  final double partWidgetHeight = 50;
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +17,17 @@ class PartsOverviewWidget extends StatelessWidget {
       final partsState = Get.find<PartsManagerState>();
       final items = partsState.getPartWithIds(state.selectedLocation!.parts);
       final selectedPart = partsState.selectedPart;
+      final scrollController = ScrollController();
+      final  partWidgetHeight = MediaQuery.of(context).size.height * 0.045;
+
       double itemIndex = 0;
       if (selectedPart != null) {
         itemIndex = items.indexOf(selectedPart).toDouble();
       }
-      final scrollController =ScrollController(
-          initialScrollOffset: itemIndex * partWidgetHeight);
+      final itemPosition = (itemIndex * partWidgetHeight);
+      Future.delayed(const Duration(milliseconds: 5),
+          () => _scrollListViewToSelected(scrollController, itemPosition));
+
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -34,21 +38,36 @@ class PartsOverviewWidget extends StatelessWidget {
           ),
           const PartsHeaderWidget(),
           Flexible(
-            child: ListView(
-              key: Key(itemIndex.toString()),
-              controller: scrollController,
-              children: [
-                ...items.map((e) => PartWidget(
-                      item: e,
-                      onTap: () => partsState.selectPart(e),
-                      partSelected: partsState.currentPartSelected(e.partNo),
-                      widgetMaxHeight: partWidgetHeight,
-                    ))
-              ],
-            ),
-          ),
+              child: ListView(
+            controller: scrollController,
+            children: [
+              ...items.map((e) => PartWidget(
+                    item: e,
+                    onTap: () => partsState.selectPart(e),
+                    partSelected: partsState.currentPartSelected(e.partNo),
+                    widgetMaxHeight: partWidgetHeight,
+                  ))
+            ],
+          )),
         ],
       );
     });
+  }
+
+  void _scrollListViewToSelected(
+    ScrollController scrollController,
+    double itemPosition,
+  ) {
+    final currentViewPos = scrollController.position.pixels;
+    final portDimensions = scrollController.position.viewportDimension;
+    final currentViewMaxPos = currentViewPos + portDimensions;
+
+    if (itemPosition < currentViewPos || itemPosition > currentViewMaxPos) {
+      scrollController.animateTo(
+        itemPosition,
+        duration: const Duration(milliseconds: 5),
+        curve: Curves.fastOutSlowIn,
+      );
+    }
   }
 }

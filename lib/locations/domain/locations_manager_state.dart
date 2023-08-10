@@ -36,10 +36,16 @@ class LocationManagerState extends GetxController {
   toggleLocationSelection(Location? val) {
     if (_selectedLocation == val || val == null) {
       _menu.toggleMenu(null);
+      Get.find<PartsManagerState>().deselectPart();
+      treeController.rebuild();
     } else {
-      _menu.showMenu(val);
-      _logbook.filterLogByLocation(val.id);
+      _selectLocation(val);
     }
+  }
+
+  void _selectLocation(Location val) {
+    _menu.showMenu(val);
+    _logbook.filterLogByLocation(val.id);
     Get.find<PartsManagerState>().deselectPart();
     treeController.rebuild();
   }
@@ -292,11 +298,11 @@ class LocationManagerState extends GetxController {
     try {
       final location = locations.values
           .firstWhere((location) => location.parts.contains(partId));
-      toggleLocationSelection(location);
+      _selectLocation(location);
       _expandTillSelected();
-    }
-    on StateError catch(_){
-      Get.defaultDialog(title: '', middleText: 'No Location containing [$partId] found');
+    } on StateError catch (_) {
+      Get.defaultDialog(
+          title: '', middleText: 'No Location containing [$partId] found');
     }
   }
 }

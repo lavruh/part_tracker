@@ -51,11 +51,9 @@ class _Child extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = selected ? bold : null;
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.45,
-        maxHeight: widgetMaxHeight,
-      ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.45,
+      height: widgetMaxHeight,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
