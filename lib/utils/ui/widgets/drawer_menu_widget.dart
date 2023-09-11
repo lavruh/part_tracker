@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:part_tracker/backup/ui/screens/backups_dialog.dart';
 import 'package:part_tracker/logbook/ui/widgets/logbook_overview_widget.dart';
 import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
 
@@ -37,10 +38,15 @@ class DrawerMenuWidget extends StatelessWidget {
               leading: const Icon(Icons.settings),
               title: const Text('Set app db file'),
               onTap: () => setAppDB(context)),
+          ListTile(
+              leading: const Icon(Icons.backup),
+              title: const Text('Backups'),
+              onTap: () {
+                Get.defaultDialog(
+                    title: 'Backups', content: const BackupsDialogWidget());
+              }),
         ],
       ),
     );
   }
-
-
 }

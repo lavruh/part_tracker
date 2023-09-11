@@ -22,40 +22,43 @@ class RestartWidget extends StatefulWidget {
 class _RestartWidgetState extends State<RestartWidget> {
   Key key = UniqueKey();
 
-  void restartApp() async {
+  restartApp() async {
     await Get.deleteAll();
+    Future.delayed(const Duration(seconds: 1));
     key = UniqueKey();
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        key: key,
-        future: initDependencies(),
-        builder: (context, _) {
-          Widget child = const Center(child: CircularProgressIndicator());
-          final loaded = _.data;
-          if (_.hasError) {
-            final errString = _.error.toString();
-            if (errString.contains('No db')) {
-              setAppDB(context);
+    return KeyedSubtree(
+      key: key,
+      child: FutureBuilder(
+          future: initDependencies(),
+          builder: (context, _) {
+            final loaded = _.data;
+            if (_.hasError) {
+              final errString = _.error.toString();
+              if (errString.contains('No db')) {
+                setAppDB(context);
+              }
+              return Scaffold(body: Center(child: Text(errString)));
             }
-            child = Scaffold(body: Center(child: Text(errString)));
-          }
-          if (loaded != null && loaded == true) {
-            child = const LocationsOverviewScreen();
-          }
+            if (loaded == null || loaded == false) {
+              return const MaterialApp(
+                home:
+                    Scaffold(body: Center(child: CircularProgressIndicator())),
+              );
+            }
 
-          return KeyedSubtree(
-            child: GetMaterialApp(
-              debugShowCheckedModeBanner: false,
+            return GetMaterialApp(
+              // debugShowCheckedModeBanner: false,
               theme: ThemeData(
                 primarySwatch: Colors.grey,
               ),
-              home: child,
-            ),
-          );
-        });
+              home: const LocationsOverviewScreen(),
+            );
+          }),
+    );
   }
 }

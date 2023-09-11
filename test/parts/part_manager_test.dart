@@ -93,12 +93,14 @@ void main() {
           partNo: UniqueId(id: 'p1'),
           type: type,
           runningHours: RunningHours(10),
-          remarks: '');
+          remarks: '',
+          runningHoursAtLocation: RunningHours(0));
       final part2 = Part(
           partNo: UniqueId(id: 'p2'),
           type: type,
           runningHours: RunningHours(15),
-          remarks: '');
+          remarks: '',
+          runningHoursAtLocation: RunningHours(0));
       final partIds = [part1.partNo, part2.partNo];
       final updatedRunningHours = RunningHours(20);
       await sut.updatePart(part1);
@@ -116,7 +118,6 @@ void main() {
       expect(sut.parts.values.first.runningHours, newRH1);
       expect(sut.parts.values.last.runningHours,
           updatedRunningHours + part2.runningHours);
-
     });
   });
 }
