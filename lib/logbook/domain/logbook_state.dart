@@ -111,7 +111,7 @@ class LogbookState extends GetxController {
     entries.add(logEntry);
     db.update(
         id: logEntry.id.toString(), item: logEntry.toMap(), table: _tableName);
-    _backupState.createBackup(description: logEntry.date.toString());
+    _backupState.createBackup(description: logEntry.date.millisecondsSinceEpoch.toString());
   }
 
   updateLogEntry(LogEntry entry) {
