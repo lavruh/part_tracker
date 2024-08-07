@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/di.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen.dart';
+import 'package:part_tracker/locations/ui/screens/locations_overview_screen_mobile.dart';
 import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
 
 void main() async {
@@ -44,7 +47,12 @@ class _RestartWidgetState extends State<RestartWidget> {
             child = Scaffold(body: Center(child: Text(errString)));
           }
           if (loaded != null && loaded == true) {
-            child = const LocationsOverviewScreen();
+            if (Platform.isLinux) {
+              child = const LocationsOverviewScreen();
+            }
+            if (Platform.isAndroid) {
+              child = const LocationsOverviewScreenMobile();
+            }
           }
 
           return KeyedSubtree(

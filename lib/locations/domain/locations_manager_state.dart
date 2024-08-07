@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
@@ -15,6 +16,7 @@ class LocationManagerState extends GetxController {
   final _menu = Get.find<LocationsMenuState>();
   final _logbook = Get.find<LogbookState>();
   late TreeController<Location> _treeController;
+  final pageController = PageController();
 
   LocationManagerState() {
     _setTreeController();
@@ -25,10 +27,15 @@ class LocationManagerState extends GetxController {
 
   _setTreeController() {
     _treeController = TreeController(
-        roots: getSubLocations(null),
-        childrenProvider: (location) {
-          return getSubLocations(location.id);
-        });
+      roots: getSubLocations(null),
+      childrenProvider: (location) {
+        return getSubLocations(location.id);
+      },
+      parentProvider: (node) {
+        if (node.parentLocation == null) return null;
+        return getParentLocation(node.parentLocation!);
+      },
+    );
   }
 
   Location? get _selectedLocation => _menu.selectedLocation;
@@ -109,10 +116,7 @@ class LocationManagerState extends GetxController {
 
   _expandTillSelected() {
     if (_selectedLocation != null) {
-      treeController.expandAncestors(_selectedLocation!, (node) {
-        if (node.parentLocation == null) return null;
-        return getParentLocation(node.parentLocation!);
-      });
+      treeController.expandAncestors(_selectedLocation!);
     }
   }
 
@@ -305,6 +309,8 @@ class LocationManagerState extends GetxController {
           title: '', middleText: 'No Location containing [$partId] found');
     }
   }
+
+  void showLocations() => pageController.jumpTo(0);
 }
 
 class LocationManagerException implements Exception {
