@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 
 class EditorWidget extends StatelessWidget {
   const EditorWidget(
-      {Key? key,
+      {super.key,
       required this.child,
       required this.isSet,
       required this.isChanged,
-      required this.save})
-      : super(key: key);
+      required this.save});
 
   final Widget child;
   final bool isSet;
@@ -20,21 +20,30 @@ class EditorWidget extends StatelessWidget {
     if (!isSet) {
       return Container();
     }
-    return WillPopScope(
-      onWillPop: () async => await _hasToSaveDialog(),
-      child: SizedBox(
-        height: 400,
-        width: 700,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SingleChildScrollView(child: child),
-              if (isChanged)
-                TextButton(onPressed: () => save(), child: const Text('Save')),
-            ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (_) async {
+        final flag = await _hasToSaveDialog();
+        if (flag) {
+          Get.back();
+        }
+      },
+      child: Flexible(
+        child: SizedBox(
+          height: 400,
+          width: 700,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(child: SingleChildScrollView(child: child)),
+                if (isChanged)
+                  TextButton(
+                      onPressed: () => save(), child: const Text('Save')),
+              ],
+            ),
           ),
         ),
       ),

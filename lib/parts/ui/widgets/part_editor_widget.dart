@@ -7,7 +7,7 @@ import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/editor_widget.dart';
 
 class PartEditorWidget extends StatelessWidget {
-  const PartEditorWidget({Key? key}) : super(key: key);
+  const PartEditorWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +15,16 @@ class PartEditorWidget extends StatelessWidget {
       final child = Form(
         key: state.formKey,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             TextFormField(
               controller: TextEditingController(text: state.partNo),
               decoration: const InputDecoration(labelText: 'Part number'),
               onFieldSubmitted: (v) {
-                state.updatePart(state.part!.copyWith(partNo: UniqueId(id: v)));
+                state.updatePart(
+                    state.part!.copyWith(partNo: UniqueId(id: v)));
               },
               validator: (v) {
                 if (v == null) return 'Wrong value';
