@@ -18,7 +18,7 @@ class PartsHeaderWidget extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           ConstrainedBox(
               constraints: const BoxConstraints(minWidth: 125),
