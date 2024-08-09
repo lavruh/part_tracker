@@ -1,34 +1,35 @@
 name: part_tracker
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.3.18+1
+version: 1.4.3+1
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: '>=3.3.2 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  path: ^1.8.2
-  get: ^4.6.5
-  flutter_fancy_tree_view: ^1.1.0
-  mockito: ^5.4.0
-  build_runner: ^2.3.3
-  intl: ^0.18.1
-  sembast: ^3.4.9
-  path_provider: ^2.0.15
-  file_picker: ^5.2.9
+  path: ^1.9.0
+  get: ^4.6.6
+  flutter_fancy_tree_view: ^1.6.0
+  intl: ^0.19.0
+  sembast: ^3.7.2
+  path_provider: ^2.1.4
+  file_picker: ^8.0.7
   data_on_image_view:
     git:
       url: https://github.com/lavruh/data_on_image_view.git
-  shared_preferences: ^2.2.0
-  package_info_plus: ^4.0.2
   archive: ^3.3.7
+  shared_preferences: ^2.3.1
+  package_info_plus: ^8.0.1
+  window_manager: ^0.4.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.11
+  mockito: ^5.4.4
 
 flutter:
   uses-material-design: true

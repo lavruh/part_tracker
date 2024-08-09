@@ -6,7 +6,7 @@ import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/editor_widget.dart';
 
 class LocationEditorWidget extends StatelessWidget {
-  const LocationEditorWidget({Key? key}) : super(key: key);
+  const LocationEditorWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

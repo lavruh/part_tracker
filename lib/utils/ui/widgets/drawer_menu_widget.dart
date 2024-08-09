@@ -1,11 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/backup/ui/screens/backups_dialog.dart';
-import 'package:part_tracker/logbook/ui/widgets/logbook_overview_widget.dart';
+import 'package:part_tracker/logbook/ui/screens/logbook_overview_screen.dart';
+import 'package:part_tracker/logbook/ui/widgets/logbook_overview_dialog.dart';
 import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
 
 class DrawerMenuWidget extends StatelessWidget {
-  const DrawerMenuWidget({Key? key}) : super(key: key);
+  const DrawerMenuWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +34,11 @@ class DrawerMenuWidget extends StatelessWidget {
               leading: const Icon(Icons.book),
               title: const Text('Logbook'),
               onTap: () {
-                Get.defaultDialog(
-                    title: 'Logbook', content: const LogBookOverviewWidget());
+                if (Platform.isAndroid) {
+                  Get.to(const LogbookOverviewScreen());
+                } else {
+                  showLogbookOverviewDialog(context);
+                }
               }),
           ListTile(
               leading: const Icon(Icons.settings),
