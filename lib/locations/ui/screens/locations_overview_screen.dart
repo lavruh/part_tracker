@@ -10,7 +10,7 @@ import 'package:part_tracker/parts/ui/widgets/parts_overview_widget.dart';
 import 'package:part_tracker/utils/ui/widgets/drawer_menu_widget.dart';
 
 class LocationsOverviewScreen extends StatelessWidget {
-  const LocationsOverviewScreen({Key? key}) : super(key: key);
+  const LocationsOverviewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

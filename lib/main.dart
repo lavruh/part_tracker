@@ -12,7 +12,7 @@ void main() async {
 }
 
 class RestartWidget extends StatefulWidget {
-  const RestartWidget({Key? key}) : super(key: key);
+  const RestartWidget({super.key});
 
   static void restartApp(BuildContext context) {
     context.findAncestorStateOfType<_RestartWidgetState>()?.restartApp();
@@ -36,11 +36,11 @@ class _RestartWidgetState extends State<RestartWidget> {
     return FutureBuilder(
         key: key,
         future: initDependencies(),
-        builder: (context, _) {
+        builder: (context, r) {
           Widget child = const Center(child: CircularProgressIndicator());
-          final loaded = _.data;
-          if (_.hasError) {
-            final errString = _.error.toString();
+          final loaded = r.data;
+          if (r.hasError) {
+            final errString = r.error.toString();
             if (errString.contains('No db')) {
               setAppDB(context);
             }
