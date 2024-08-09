@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:part_tracker/backup/domain/backups_state.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/logbook/domain/entities/log_entry.dart';
@@ -16,6 +17,7 @@ class LogbookState extends GetxController {
   final IDbService db = Get.find();
   final _tableName = 'logbook';
   final textFilter = ''.obs;
+  final _backupState = Get.find<BackupState>();
 
   showAllLog() {
     filteredEntries.value = entries;
@@ -109,6 +111,7 @@ class LogbookState extends GetxController {
     entries.add(logEntry);
     db.update(
         id: logEntry.id.toString(), item: logEntry.toMap(), table: _tableName);
+    _backupState.createBackup(description: logEntry.date.millisecondsSinceEpoch.toString());
   }
 
   updateLogEntry(LogEntry entry) {

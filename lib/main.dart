@@ -25,8 +25,9 @@ class RestartWidget extends StatefulWidget {
 class _RestartWidgetState extends State<RestartWidget> {
   Key key = UniqueKey();
 
-  void restartApp() async {
+  restartApp() async {
     await Get.deleteAll();
+    Future.delayed(const Duration(seconds: 1));
     key = UniqueKey();
     setState(() {});
   }
@@ -58,12 +59,13 @@ class _RestartWidgetState extends State<RestartWidget> {
           return KeyedSubtree(
             child: GetMaterialApp(
               debugShowCheckedModeBanner: false,
+
               theme: ThemeData(
                 primarySwatch: Colors.grey,
               ),
-              home: child,
-            ),
-          );
-        });
+              home: const LocationsOverviewScreen(),
+            );
+          }),
+    );
   }
 }
