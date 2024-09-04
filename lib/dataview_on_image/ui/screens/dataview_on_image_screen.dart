@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
 
 class DataViewOnImageScreen extends StatelessWidget {
-  const DataViewOnImageScreen({Key? key}) : super(key: key);
+  const DataViewOnImageScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +25,9 @@ class DataViewOnImageScreen extends StatelessWidget {
                   config: config,
                   data: state.data,
                   useMenu: false,
+                  onSaveConfig: (conf) => state.saveConfig(conf),
+                  selectFileDialog: (title) async =>
+                      state.selectFile(context, title),
                 ));
     });
   }

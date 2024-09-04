@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
 
 class DataViewOnImageEditor extends StatelessWidget {
-  const DataViewOnImageEditor({Key? key}) : super(key: key);
+  const DataViewOnImageEditor({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +18,8 @@ class DataViewOnImageEditor extends StatelessWidget {
           child = EditorScreen(
             config: config,
             useBackButton: false,
+            saveConfig: (conf) => state.saveConfig(conf),
+            selectImage: () => state.selectFile(context, 'Select image file'),
           );
         } catch (e) {
           child = Text(e.toString());

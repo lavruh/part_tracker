@@ -2,12 +2,13 @@ import 'dart:io';
 
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/domain/view_port.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_editor.dart';
 import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_screen.dart';
 import 'package:part_tracker/dataview_on_image/ui/widgets/dataview_on_image_settings_widget.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
+import 'package:part_tracker/utils/data/i_file_provider.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 
@@ -19,6 +20,7 @@ class DataViewOnImageState extends GetxController {
   bool configChanged = false;
   final table = 'dataOnImageConfigs';
   final IDbService _db = Get.find();
+  final _fileProvider = Get.find<IFileProvider>();
 
   OverviewScreenConfig? get selectedConfig =>
       _selectedConfig.isNotEmpty ? _selectedConfig[0] : null;
@@ -54,15 +56,17 @@ class DataViewOnImageState extends GetxController {
     }
   }
 
-  showDataViewOnImage({
+  showDataViewOnImage(
+    BuildContext context, {
     required UniqueId locationId,
     required Map<String, Map<String, String>> data,
   }) async {
+    final c = context;
     if (_configs.isEmpty) {
       await getConfigs();
     }
-    if (!_configs.containsKey(locationId)) {
-      await createOrSelectConfig(locationId);
+    if (!_configs.containsKey(locationId) && c.mounted) {
+      await createOrSelectConfig(locationId, context);
     }
     if (_configs.containsKey(locationId)) {
       final path = _configs[locationId] ?? '';
@@ -72,7 +76,7 @@ class DataViewOnImageState extends GetxController {
         Get.to(() => const DataViewOnImageScreen());
       } on Exception catch (e) {
         await Get.defaultDialog(middleText: e.toString());
-        selectConfigFile(locationId);
+        if (c.mounted) selectConfigFile(locationId, context);
       }
     }
   }
@@ -128,48 +132,74 @@ class DataViewOnImageState extends GetxController {
     return false;
   }
 
-  selectConfigFile(UniqueId locationId) async {
-    final f = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select config file',
-      allowedExtensions: ['.json'],
-    );
-    if (f != null) {
-      final path = f.paths.first ?? '';
+  selectConfigFile(UniqueId locationId, BuildContext context) async {
+    try {
+      final f = await _fileProvider.selectFile(
+          context: context,
+          title: 'Select config file',
+          allowedExtensions: ['json']);
+
+      final path = f.path;
       addConfig(configPath: path, locationId: locationId);
       _db.update(id: locationId.id, item: {locationId.id: path}, table: table);
+    } catch (e) {
+      Get.defaultDialog(middleText: "$e");
     }
   }
 
-  createOrSelectConfig(UniqueId locationId) async {
+  createOrSelectConfig(UniqueId locationId, BuildContext context) async {
+    final c = context;
     final act = await questionDialogWidget(
         question:
             'Config file not found.\n Yes to create new,\n No select existing file.');
-    if (act != null) {
+    if (act != null && c.mounted) {
       if (act) {
-        await _createConfigFile(locationId);
+        await _createConfigFile(locationId, context);
       } else {
-        await selectConfigFile(locationId);
+        await selectConfigFile(locationId, context);
       }
     }
   }
 
-  Future<void> _createConfigFile(UniqueId locationId) async {
-    final img =
-        await FilePicker.platform.pickFiles(dialogTitle: 'Select image file');
-    final imgPath = img?.files.first.path;
-    if (img == null || imgPath == null) return;
-
-    final conf = OverviewScreenConfig(path: imgPath, viewPorts: {});
-    final path =
-        await FilePicker.platform.saveFile(dialogTitle: 'Save new config');
-    if (path != null) {
+  Future<void> _createConfigFile(
+      UniqueId locationId, BuildContext context) async {
+    final c = context;
+    try {
+      final img = await _fileProvider.selectFile(
+          context: context,
+          title: 'Select image file',
+          allowedExtensions: ['jpg', 'jpeg', 'png']);
+      final imgPath = img.path;
+      final conf = OverviewScreenConfig(path: imgPath, viewPorts: {});
+      if (!c.mounted) return;
+      final file = await _fileProvider.selectFile(
+        context: c,
+        title: 'Save new config',
+        allowedExtensions: ['json'],
+      );
+      final path = file.path;
       File(path).writeAsStringSync(conf.toJson());
       addConfig(configPath: path, locationId: locationId);
       _db.update(id: locationId.id, item: {locationId.id: path}, table: table);
+    } on Exception catch (e) {
+      Get.defaultDialog(middleText: "$e");
+      return;
     }
   }
 
   void reloadConfigFile() async {
     await setSelectedConfig(selectedConfigPath);
+  }
+
+  saveConfig(OverviewScreenConfig conf) async {
+    updateConfig(conf);
+    final selectedConfigPath = selectedConfig?.path;
+    if (selectedConfigPath != null) {
+      File(selectedConfigPath).writeAsString(conf.toJson());
+    }
+  }
+
+  Future<File> selectFile(BuildContext context, String title) async {
+    return _fileProvider.selectFile(context: context, title: title);
   }
 }
