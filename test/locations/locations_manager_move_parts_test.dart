@@ -1,19 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
+import 'package:part_tracker/logbook/domain/logbook_state.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
-import 'locations_manager_test.mocks.dart';
+import '../mocks.dart';
+import 'locations_manager_move_parts_test.mocks.dart';
 
+@GenerateMocks([IDbService])
 main() {
   late LocationManagerState sut;
   late IDbService dbMock;
@@ -35,15 +40,17 @@ main() {
     when(dbMock.getAll(table: 'locations'))
         .thenAnswer((_) => const Stream.empty());
     when(dbMock.getAll(table: 'parts')).thenAnswer((_) => const Stream.empty());
-    Get.put(LocationEditorState());
-    Get.put(LocationsMenuState());
+    Get.put<LocationEditorState>(MockLocationEditorState());
+    Get.put<LocationsMenuState>(MockLocationsMenuState());
+    Get.put<PartEditorState>(MockPartEditorState());
+    Get.put<LogbookState>(MockLogbookState());
     partsManagerState = Get.put(PartsManagerState());
     sut = Get.put(LocationManagerState());
   });
 
   tearDown(() {
-    partsManagerState.parts.clear();
-    sut.locations.clear();
+    // partsManagerState.parts.clear();
+    // sut.locations.clear();
   });
 
   test('Move Part Between Locations', () async {
@@ -98,8 +105,9 @@ main() {
         ));
   });
 
-  test("""movePartBetweenLocations should throw exception 
-      if running hours of source location updated more then 1 day ago""", () async {
+  test(
+      """movePartBetweenLocations should throw exception if running hours of source location updated more then 1 day ago""",
+      () async {
     final targetLocation = Location(
       id: targetLocationId,
       name: 'Target Location',
@@ -114,7 +122,8 @@ main() {
       'date': now.copyWith(day: now.day - 1).millisecondsSinceEpoch,
     });
     await partsManagerState.updatePart(part.copyWith(runningHours: rh));
-    await sut.updateLocation(sourceLocation);
+    await sut.updateLocation(sourceLocation.copyWith(
+        runningHours: RunningHours(0).copyWith(date: DateTime(2022))));
     await sut.updateLocation(targetLocation);
 
     // Call the method

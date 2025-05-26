@@ -174,6 +174,24 @@ class LocationManagerState extends GetxController {
     return false;
   }
 
+  moveAllPartsOfTypeToLocation({
+    required List<UniqueId> partTypes,
+    required UniqueId sourceLocation,
+    required UniqueId targetLocation,
+  }) async {
+    final partsManager = Get.find<PartsManagerState>();
+    final target = locations[targetLocation];
+    if (target == null) {
+      throw LocationManagerException('Invalid source or target location');
+    }
+    for (final type in partTypes) {
+      if (!target.allowedPartTypes.containsKey(type)) {
+        throw LocationManagerException(
+            'Part type[$type] is not suitable for target location');
+      }
+    }
+  }
+
   movePartBetweenLocations({
     required UniqueId partId,
     required UniqueId? sourceLocation,
