@@ -1,0 +1,47 @@
+name: Android Release
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: flutter release apk
+    runs-on: ubuntu-latest
+    env:
+      APP_NAME: part_tracker
+      BUILD_PATH: build/app/outputs/flutter-apk/
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: read-version
+        uses: NiklasLehnfeld/flutter-version-number-action@main
+        with:
+          file-path: pubspec.yaml
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.32.0'
+
+      - name: Clean project dependencies
+        run: flutter clean
+
+      - name: Install project dependencies
+        run: flutter pub get
+
+      - name: Generate intermediates
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Build artifacts
+        run: flutter build apk --release --flavor production
+
+      - name: Rename file
+        run: mv ${{ env.BUILD_PATH }}app-production-release.apk ${{ env.BUILD_PATH }}${{ env.APP_NAME }}-${{ steps.read-version.outputs.version-number }}.apk
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.APP_NAME }}-${{ steps.read-version.outputs.version-number }}
+          files: ${{ env.BUILD_PATH }}${{ env.APP_NAME }}-${{ steps.read-version.outputs.version-number }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
