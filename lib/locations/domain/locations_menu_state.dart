@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
@@ -66,13 +67,13 @@ class LocationsMenuState extends GetxController {
     }
   }
 
-  showDataOnImgSelectedLocation() {
+  showDataOnImgSelectedLocation(BuildContext context) {
     final location = selectedLocation;
     if (location != null) {
       final data = Get.find<LocationManagerState>()
           .getLocationTreeReportData(locationId: location.id);
       Get.find<DataViewOnImageState>()
-          .showDataViewOnImage(locationId: location.id, data: data);
+          .showDataViewOnImage(context, locationId: location.id, data: data);
     }
   }
 }

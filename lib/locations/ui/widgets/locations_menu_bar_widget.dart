@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 
 class LocationsMenuBarWidget extends StatelessWidget {
-  const LocationsMenuBarWidget({Key? key}) : super(key: key);
+  const LocationsMenuBarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class LocationsMenuBarWidget extends StatelessWidget {
             icon: const Icon(Icons.delete),
             tooltip: 'Delete'),
         IconButton(
-            onPressed: () => state.showDataOnImgSelectedLocation(),
+            onPressed: () => state.showDataOnImgSelectedLocation(context),
             icon: const Icon(Icons.image),
             tooltip: 'Show report'),
       ];

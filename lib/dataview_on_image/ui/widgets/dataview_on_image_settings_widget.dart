@@ -5,7 +5,7 @@ import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/utils/ui/widgets/editor_widget.dart';
 
 class DataViewOnImageSettingsWidget extends StatelessWidget {
-  const DataViewOnImageSettingsWidget({Key? key}) : super(key: key);
+  const DataViewOnImageSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class DataViewOnImageSettingsWidget extends StatelessWidget {
           ListTile(
             leading: const Text('Config file:'),
             title: TextButton(
-              onPressed: () => _selectConfigFile(state),
+              onPressed: () => _selectConfigFile(state, context),
               child: Text(state.selectedConfigPath),
             ),
             trailing: IconButton(
@@ -49,10 +49,10 @@ class DataViewOnImageSettingsWidget extends StatelessWidget {
     });
   }
 
-  void _selectConfigFile(DataViewOnImageState state) {
+  void _selectConfigFile(DataViewOnImageState state, BuildContext context) {
     final locationId = Get.find<LocationsMenuState>().selectedLocation?.id;
     if (locationId != null) {
-      state.selectConfigFile(locationId);
+      state.selectConfigFile(locationId, context);
     }
   }
 }

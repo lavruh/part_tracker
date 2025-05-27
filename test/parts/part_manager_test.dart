@@ -2,16 +2,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:part_tracker/locations/domain/locations_manager_state.dart';
+import 'package:part_tracker/locations/domain/locations_menu_state.dart';
+import 'package:part_tracker/logbook/domain/logbook_state.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
-
+import '../mocks.dart';
 import 'part_manager_test.mocks.dart';
 
-@GenerateMocks([IDbService])
+@GenerateNiceMocks([MockSpec<IDbService>()])
 void main() {
   late PartsManagerState sut;
   late IDbService dbMock;
@@ -22,6 +26,12 @@ void main() {
       dbMock = Get.put<IDbService>(MockIDbService());
       when(dbMock.getAll(table: 'parts'))
           .thenAnswer((_) => const Stream.empty());
+      final editorMock = MockPartEditorState();
+      Get.put<LocationsMenuState>(MockLocationsMenuState());
+      Get.put<PartEditorState>(editorMock);
+      Get.put<LogbookState>(MockLogbookState());
+      Get.put<LocationManagerState>(MockLocationManagerState());
+      Get.put<LocationsMenuState>(MockLocationsMenuState());
       sut = PartsManagerState();
       verify(dbMock.getAll(table: sut.table)).called(1);
     });

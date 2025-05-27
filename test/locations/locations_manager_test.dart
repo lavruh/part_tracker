@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:part_tracker/backup/data/zip_backup_service.dart';
+import 'package:part_tracker/backup/domain/backups_state.dart';
 import 'package:part_tracker/locations/domain/entities/location.dart';
 import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
@@ -14,17 +16,27 @@ import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
+import 'package:path/path.dart' as p;
+// ignore: depend_on_referenced_packages
+import 'package:file/memory.dart';
+import '../mocks.dart';
 
 import 'locations_manager_test.mocks.dart';
 
-@GenerateMocks([IDbService])
+@GenerateMocks([IDbService, BackupState])
 void main() {
+  late ZipBackupService zip;
+  late MemoryFileSystem fs;
+  final backUpDir = p.join("test", 'backup');
+
   late LocationManagerState sut;
   late Location location;
   late IDbService dbMock;
   late PartsManagerState partsManagerState;
 
   setUp(() async {
+    Get.put<BackupState>(MockBackupState());
+
     dbMock = Get.put<IDbService>(MockIDbService());
     when(dbMock.getAll(table: 'locations'))
         .thenAnswer((_) => const Stream.empty());

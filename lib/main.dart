@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,8 +7,11 @@ import 'package:part_tracker/di.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen_mobile.dart';
 import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (await isPermissionsGranted() == false) return;
   runApp(const RestartWidget());
 }
 
@@ -27,10 +31,24 @@ class _RestartWidgetState extends State<RestartWidget> {
 
   restartApp() async {
     await Get.deleteAll();
-    Future.delayed(const Duration(seconds: 1));
+    Future.delayed(const Duration(seconds: 3));
     key = UniqueKey();
     setState(() {});
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(primarySwatch: Colors.grey),
+        home: MainScreenLoader(
+          key: key,
+        ));
+  }
+}
+
+class MainScreenLoader extends StatelessWidget {
+  const MainScreenLoader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,34 +56,36 @@ class _RestartWidgetState extends State<RestartWidget> {
         key: key,
         future: initDependencies(),
         builder: (context, r) {
-          Widget child = const Center(child: CircularProgressIndicator());
           final loaded = r.data;
           if (r.hasError) {
             final errString = r.error.toString();
             if (errString.contains('No db')) {
-              setAppDB(context);
+              Timer(const Duration(seconds: 1), () {
+                //Should run after build
+                setAppDB(context);
+              });
             }
-            child = Scaffold(body: Center(child: Text(errString)));
+            return Scaffold(body: Center(child: Text(errString)));
           }
           if (loaded != null && loaded == true) {
-            if (Platform.isLinux) {
-              child = const LocationsOverviewScreen();
+            if (Platform.isLinux || Platform.isWindows) {
+              return const LocationsOverviewScreen();
             }
             if (Platform.isAndroid) {
-              child = const LocationsOverviewScreenMobile();
+              return const LocationsOverviewScreenMobile();
             }
           }
-
-          return KeyedSubtree(
-            child: GetMaterialApp(
-              debugShowCheckedModeBanner: false,
-
-              theme: ThemeData(
-                primarySwatch: Colors.grey,
-              ),
-              home: const LocationsOverviewScreen(),
-            );
-          }),
-    );
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
+        });
   }
+}
+
+Future<bool> isPermissionsGranted() async {
+  bool fl = true;
+  if (Platform.isWindows || Platform.isLinux) return true;
+  if (fl && await Permission.manageExternalStorage.status.isDenied) {
+    fl = await Permission.manageExternalStorage.request().isGranted;
+  }
+  return fl;
 }

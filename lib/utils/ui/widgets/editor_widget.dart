@@ -22,7 +22,7 @@ class EditorWidget extends StatelessWidget {
     }
     return PopScope(
       canPop: false,
-      onPopInvoked: (_) async {
+      onPopInvokedWithResult: (_, __) async {
         final flag = await _hasToSaveDialog();
         if (flag) {
           Get.back();
@@ -41,7 +41,8 @@ class EditorWidget extends StatelessWidget {
                 Flexible(child: SingleChildScrollView(child: child)),
                 if (isChanged)
                   TextButton(
-                      onPressed: () => save(), child: const Text('Save')),
+                      onPressed: () async => await save(),
+                      child: const Text('Save')),
               ],
             ),
           ),
@@ -52,6 +53,7 @@ class EditorWidget extends StatelessWidget {
 
   Future<bool> _hasToSaveDialog() async {
     bool? actFl = false;
+    print('isSet [$isSet] && isChanged [$isChanged]');
     if (isSet && isChanged) {
       actFl = await questionDialogWidget(question: 'Save changes?');
     }
