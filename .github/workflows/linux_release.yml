@@ -23,6 +23,15 @@ jobs:
           channel: 'stable'
           flutter-version: '3.32.0'
 
+      - name: Install Flutter Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang cmake git \
+            ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev \
+            libstdc++-12-dev
+
       - name: Clean project dependencies
         run: flutter clean
 
