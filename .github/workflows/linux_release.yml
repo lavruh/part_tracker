@@ -7,7 +7,7 @@ jobs:
     name: flutter release linux
     runs-on: ubuntu-latest
     env:
-      APP_NAME: part_trackerz
+      APP_NAME: part_tracker
       BUILD_PATH: build/linux/x64/release/bundle/
 
     steps:
