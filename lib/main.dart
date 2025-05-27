@@ -7,9 +7,11 @@ import 'package:part_tracker/di.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen_mobile.dart';
 import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (await isPermissionsGranted() == false) return;
   runApp(const RestartWidget());
 }
 
@@ -66,7 +68,7 @@ class MainScreenLoader extends StatelessWidget {
             return Scaffold(body: Center(child: Text(errString)));
           }
           if (loaded != null && loaded == true) {
-            if (Platform.isLinux) {
+            if (Platform.isLinux || Platform.isWindows) {
               return const LocationsOverviewScreen();
             }
             if (Platform.isAndroid) {
@@ -77,4 +79,13 @@ class MainScreenLoader extends StatelessWidget {
               body: Center(child: CircularProgressIndicator()));
         });
   }
+}
+
+Future<bool> isPermissionsGranted() async {
+  bool fl = true;
+  if (Platform.isWindows || Platform.isLinux) return true;
+  if (fl && await Permission.manageExternalStorage.status.isDenied) {
+    fl = await Permission.manageExternalStorage.request().isGranted;
+  }
+  return fl;
 }
