@@ -1,7 +1,7 @@
 name: part_tracker
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.5.1+1
+version: 1.5.3+1
 
 environment:
   sdk: '>=3.3.2 <4.0.0'
@@ -15,15 +15,16 @@ dependencies:
   intl: ^0.20.2
   sembast: ^3.8.5+1
   path_provider: ^2.1.5
-  file_picker: 8.1.2
   data_on_image_view:
     git:
       url: https://github.com/lavruh/data_on_image_view.git
+  file_provider:
+    git: https://github.com/lavruh/file_provider.git
+
   archive: ^4.0.7
   shared_preferences: ^2.5.3
   package_info_plus: ^8.3.0
   window_manager: ^0.4.3
-  filesystem_picker: ^4.1.0
   permission_handler: ^12.0.0+1
 
 dev_dependencies:
