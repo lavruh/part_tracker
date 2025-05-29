@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:file_provider/file_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/main.dart';
-import 'package:part_tracker/utils/data/i_file_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 setAppDB(BuildContext context) async {

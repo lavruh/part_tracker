@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/domain/view_port.dart';
+import 'package:file_provider/file_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_editor.dart';
 import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_screen.dart';
 import 'package:part_tracker/dataview_on_image/ui/widgets/dataview_on_image_settings_widget.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
-import 'package:part_tracker/utils/data/i_file_provider.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 
@@ -62,9 +62,8 @@ class DataViewOnImageState extends GetxController {
     required Map<String, Map<String, String>> data,
   }) async {
     final c = context;
-    if (_configs.isEmpty) {
-      await getConfigs();
-    }
+    if (_configs.isEmpty) await getConfigs();
+
     if (!_configs.containsKey(locationId) && c.mounted) {
       await createOrSelectConfig(locationId, context);
     }
@@ -73,10 +72,17 @@ class DataViewOnImageState extends GetxController {
       try {
         await setSelectedConfig(path);
         this.data.value = data;
-        Get.to(() => const DataViewOnImageScreen());
+        final config = selectedConfig;
+        if (config != null) {
+          if (config.path.isEmpty) {
+            showConfigEditor();
+          } else {
+            Get.to(() => const DataViewOnImageScreen());
+          }
+        }
       } on Exception catch (e) {
         await Get.defaultDialog(middleText: e.toString());
-        if (c.mounted) selectConfigFile(locationId, context);
+        if (c.mounted) createOrSelectConfig(locationId, context);
       }
     }
   }
@@ -165,12 +171,12 @@ class DataViewOnImageState extends GetxController {
       UniqueId locationId, BuildContext context) async {
     final c = context;
     try {
-      final img = await _fileProvider.selectFile(
-          context: context,
-          title: 'Select image file',
-          allowedExtensions: ['jpg', 'jpeg', 'png']);
-      final imgPath = img.path;
-      final conf = OverviewScreenConfig(path: imgPath, viewPorts: {});
+      // final img = await _fileProvider.selectFile(
+      //     context: context,
+      //     title: 'Select image file',
+      //     allowedExtensions: ['jpg', 'jpeg', 'png']);
+      // final imgPath = img.path;
+      final conf = OverviewScreenConfig(path: "", viewPorts: {});
       if (!c.mounted) return;
       final file = await _fileProvider.selectFile(
         context: c,
@@ -181,6 +187,7 @@ class DataViewOnImageState extends GetxController {
       File(path).writeAsStringSync(conf.toJson());
       addConfig(configPath: path, locationId: locationId);
       _db.update(id: locationId.id, item: {locationId.id: path}, table: table);
+      showConfigEditor();
     } on Exception catch (e) {
       Get.defaultDialog(middleText: "$e");
       return;
@@ -193,8 +200,7 @@ class DataViewOnImageState extends GetxController {
 
   saveConfig(OverviewScreenConfig conf) async {
     updateConfig(conf);
-    final selectedConfigPath = selectedConfig?.path;
-    if (selectedConfigPath != null) {
+    if (selectedConfigPath.isNotEmpty) {
       File(selectedConfigPath).writeAsString(conf.toJson());
     }
   }

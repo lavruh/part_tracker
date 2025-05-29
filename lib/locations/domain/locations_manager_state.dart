@@ -290,7 +290,7 @@ class LocationManagerState extends GetxController {
           Get.find<PartsManagerState>().getPartWithIds(location.parts);
       for (final p in parts) {
         pMap.putIfAbsent(
-            p.type.name, () => "no:${p.partNo} rh: ${p.runningHours.value}");
+            p.type.name, () => "no:${p.partNo} rh: ${p.runningHoursAtLocation.value}");
       }
     }
     res.putIfAbsent(location.id.toString(), () => pMap);

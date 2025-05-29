@@ -26,11 +26,8 @@ class DataViewOnImageEditor extends StatelessWidget {
         }
       }
 
-      return WillPopScope(
-          onWillPop: () async {
-            state.reloadConfigFile();
-            return true;
-          },
+      return PopScope(
+          onPopInvokedWithResult: (fl, data) async => state.reloadConfigFile(),
           child: Scaffold(
             appBar: AppBar(
               actions: [
