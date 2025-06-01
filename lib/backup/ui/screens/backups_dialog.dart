@@ -3,11 +3,11 @@ import 'package:get/get.dart';
 import 'package:part_tracker/backup/domain/backups_state.dart';
 import 'package:part_tracker/backup/ui/widgets/backup_item_widget.dart';
 import 'package:part_tracker/backup/ui/widgets/backup_settings_widget.dart';
-import 'package:part_tracker/main.dart';
 import 'package:part_tracker/utils/ui/widgets/text_input_dialog_widget.dart';
+import 'package:restart_app/restart_app.dart';
 
 class BackupsDialogWidget extends StatelessWidget {
-  const BackupsDialogWidget({Key? key}) : super(key: key);
+  const BackupsDialogWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,15 +38,15 @@ class BackupsDialogWidget extends StatelessWidget {
                   .map((e) => BackupItemWidget(
                       item: e,
                       onTap: () async {
-                        final cont = context;
                         await state.restoreToDescription(
                             description: e.description);
                         await Get.defaultDialog(
                             title: '',
                             middleText: 'To apply changes restart app');
-                        if (cont.mounted) {
-                          RestartWidget.restartApp(cont);
-                        }
+                        Restart.restartApp(
+                          notificationTitle: "Restart app",
+                          notificationBody: "Restore backup",
+                        );
                       }))
                   .toList(),
             ),

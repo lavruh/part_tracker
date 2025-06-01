@@ -1,11 +1,10 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:file_provider/file_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/backup/domain/backups_state.dart';
-import 'package:path/path.dart' as p;
 
 class BackupSettingsWidget extends StatelessWidget {
-  const BackupSettingsWidget({Key? key}) : super(key: key);
+  const BackupSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +33,13 @@ class BackupSettingsWidget extends StatelessWidget {
             ),
           ),
           const Text('Files to backup...'),
-          ...state.filesToBackupPaths
-              .map((e) => TextButton(
-                  onPressed: () {
-                    state.removeFileFromBackup(e);
-                  },
-                  child: Text(e)))
-              .toList(),
+          ...state.filesToBackupPaths.map((e) => TextButton(
+              onPressed: () {
+                state.removeFileFromBackup(e);
+              },
+              child: Text(e))),
           IconButton(
-            onPressed: () => _addFileToBackup(state),
+            onPressed: () => _addFileToBackup(context, state),
             icon: const Icon(Icons.add_link),
             tooltip: 'Add file to backup',
           ),
@@ -59,15 +56,15 @@ class BackupSettingsWidget extends StatelessWidget {
     return null;
   }
 
-  _addFileToBackup(BackupState state) async {
-    final initDir = Get.find<String>(tag: 'dirName');
-    final f = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select file to backup',
-      initialDirectory: p.join(initDir, ' '),
-    );
-    if (f != null) {
-      final path = f.paths.first ?? '';
+  _addFileToBackup(BuildContext context, BackupState state) async {
+    final fp = Get.find<IFileProvider>();
+    try {
+      final f =
+          await fp.selectFile(context: context, title: "Select file to backup");
+      final path = (f.path);
       state.addFileToBackup(path);
+    } catch (e) {
+      Get.defaultDialog(middleText: "$e");
     }
   }
 }

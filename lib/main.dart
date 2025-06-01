@@ -12,39 +12,10 @@ import 'package:permission_handler/permission_handler.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (await isPermissionsGranted() == false) return;
-  runApp(const RestartWidget());
-}
-
-class RestartWidget extends StatefulWidget {
-  const RestartWidget({super.key});
-
-  static void restartApp(BuildContext context) {
-    context.findAncestorStateOfType<_RestartWidgetState>()?.restartApp();
-  }
-
-  @override
-  State<RestartWidget> createState() => _RestartWidgetState();
-}
-
-class _RestartWidgetState extends State<RestartWidget> {
-  Key key = UniqueKey();
-
-  restartApp() async {
-    await Get.deleteAll();
-    Future.delayed(const Duration(seconds: 3));
-    key = UniqueKey();
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.grey),
-        home: MainScreenLoader(
-          key: key,
-        ));
-  }
+  runApp(GetMaterialApp(
+    theme: ThemeData(primarySwatch: Colors.grey),
+    home: const MainScreenLoader(),
+  ));
 }
 
 class MainScreenLoader extends StatelessWidget {
