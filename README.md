@@ -1,8 +1,8 @@
 # part_tracker
-App for managing staus of various equipment parts:
-- calculation of part running hours
-- logging events
-- tracking parts location.
+App for keep track of various equipment parts:
+* Calculation of part running hours
+* Logging events(replacing parts, overhaul)
+* tracking parts location.
 
 # Build from source:
 * Install Flutter latest
@@ -10,4 +10,4 @@ App for managing staus of various equipment parts:
 * Flutter run
 * Enjoy
 
- Tested on Linux and Windows10
+ Tested on Linux, Android and Windows10

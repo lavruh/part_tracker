@@ -3,11 +3,10 @@ import 'dart:io';
 import 'package:file_provider/file_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:part_tracker/main.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 setAppDB(BuildContext context) async {
-  final cont = context;
   final pref = Get.find<SharedPreferences>();
   final provider = Get.find<IFileProvider>();
   try {
@@ -24,9 +23,10 @@ setAppDB(BuildContext context) async {
       if (!file.existsSync()) {
         file.createSync();
       }
-      if (cont.mounted) {
-        RestartWidget.restartApp(cont);
-      }
+      Restart.restartApp(
+        notificationBody: "Restart App",
+        notificationTitle: "DB loaded from $path",
+      );
     }
   } catch (e) {
     Get.defaultDialog(middleText: "$e");

@@ -30,16 +30,14 @@ class ZipBackupService implements IBackupService {
       if (await file.exists()) {
         final fileName = p.basename(path);
         archive.addFile(
-            ArchiveFile(fileName, file.lengthSync(), await file.readAsBytes()));
+            ArchiveFile(fileName, file.lengthSync(), file.readAsBytesSync()));
       }
     }
 
     final backupFile = fs.file(backupFilePath);
     final bytes = ZipEncoder().encode(archive);
-    if (bytes != null) {
-      await backupFile.writeAsBytes(bytes);
+    backupFile.writeAsBytesSync(bytes);
     }
-  }
 
   @override
   Future<void> restore({int stepsBack = 1}) async {
