@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/backup/ui/screens/backups_dialog.dart';
+import 'package:part_tracker/help/ui/screens/help_screen.dart';
 import 'package:part_tracker/logbook/ui/screens/logbook_overview_screen.dart';
 import 'package:part_tracker/logbook/ui/widgets/logbook_overview_dialog.dart';
 import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
@@ -50,6 +51,12 @@ class DrawerMenuWidget extends StatelessWidget {
               onTap: () {
                 Get.defaultDialog(
                     title: 'Backups', content: const BackupsDialogWidget());
+              }),
+          ListTile(
+              leading: const Icon(Icons.help),
+              title: const Text('Help'),
+              onTap: () {
+                Get.to(() => const HelpScreen());
               }),
         ],
       ),

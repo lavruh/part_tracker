@@ -35,6 +35,12 @@ class DataViewOnImageState extends GetxController {
 
   bool get configSelected => _selectedConfig.isNotEmpty;
 
+  @override
+  onInit() {
+    getConfigs();
+    super.onInit();
+  }
+
   setSelectedConfig(String path) async {
     final file = File(path);
     if (file.existsSync()) {
@@ -56,6 +62,10 @@ class DataViewOnImageState extends GetxController {
     }
   }
 
+  bool isConfigExist(UniqueId locationId) {
+    return _configs.containsKey(locationId);
+  }
+
   showDataViewOnImage(
     BuildContext context, {
     required UniqueId locationId,
@@ -64,10 +74,10 @@ class DataViewOnImageState extends GetxController {
     final c = context;
     if (_configs.isEmpty) await getConfigs();
 
-    if (!_configs.containsKey(locationId) && c.mounted) {
+    if (!isConfigExist(locationId) && c.mounted) {
       await createOrSelectConfig(locationId, context);
     }
-    if (_configs.containsKey(locationId)) {
+    if (isConfigExist(locationId)) {
       final path = _configs[locationId] ?? '';
       try {
         await setSelectedConfig(path);

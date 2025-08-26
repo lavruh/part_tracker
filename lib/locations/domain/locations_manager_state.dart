@@ -1,3 +1,4 @@
+import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:get/get.dart';
@@ -289,8 +290,8 @@ class LocationManagerState extends GetxController {
       final parts =
           Get.find<PartsManagerState>().getPartWithIds(location.parts);
       for (final p in parts) {
-        pMap.putIfAbsent(
-            p.type.name, () => "no:${p.partNo} rh: ${p.runningHoursAtLocation.value}");
+        pMap.putIfAbsent(p.type.name,
+            () => "no:${p.partNo} rh: ${p.runningHoursAtLocation.value}");
       }
     }
     res.putIfAbsent(location.id.toString(), () => pMap);
@@ -329,6 +330,17 @@ class LocationManagerState extends GetxController {
   }
 
   void showLocations() => pageController.jumpTo(0);
+
+  Function()? getOverviewShowCallback(BuildContext context, Location location) {
+    final overviewState = Get.find<DataViewOnImageState>();
+    final locationId = location.id;
+    if (!overviewState.isConfigExist(locationId)) return null;
+    return () {
+      final data = getLocationTreeReportData(locationId: location.id);
+      overviewState.showDataViewOnImage(context,
+          locationId: locationId, data: data);
+    };
+  }
 }
 
 class LocationManagerException implements Exception {

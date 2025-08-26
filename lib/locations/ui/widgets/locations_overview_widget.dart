@@ -6,7 +6,7 @@ import 'package:part_tracker/locations/ui/widgets/location_widget.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 
 class LocationsOverviewWidget extends StatelessWidget {
-  const LocationsOverviewWidget({Key? key}) : super(key: key);
+  const LocationsOverviewWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class LocationsOverviewWidget extends StatelessWidget {
           treeController: treeController,
           nodeBuilder: (_, entry) {
             return DragTarget(
-              onAccept: (obj) => _processObj(obj, entry, state),
+              onAcceptWithDetails: (obj) => _processObj(obj, entry, state),
               builder: (context, _, __) {
                 return LocationWidget(
                   entry: entry,
@@ -33,6 +33,8 @@ class LocationsOverviewWidget extends StatelessWidget {
                   },
                   isSelected: state.isLocationSelected(entry.node),
                   showRunningHours: state.showLocationRunningHours(entry.node),
+                  showOverview:
+                      state.getOverviewShowCallback(context, entry.node),
                 );
               },
             );
