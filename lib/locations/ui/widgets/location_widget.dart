@@ -6,51 +6,61 @@ import 'package:part_tracker/running_hours/ui/widgets/running_hours_edit_dialog.
 
 class LocationWidget extends StatelessWidget {
   const LocationWidget({
-    Key? key,
+    super.key,
     required this.entry,
     required this.expandCallback,
     required this.selectCallback,
     required this.isSelected,
     required this.showRunningHours,
     required this.updateRunningHours,
-  }) : super(key: key);
+    this.showOverview,
+  });
   final TreeEntry<Location> entry;
   final bool isSelected;
   final bool showRunningHours;
   final Function expandCallback;
   final Function selectCallback;
   final Function(RunningHours) updateRunningHours;
+  final Function()? showOverview;
 
   @override
   Widget build(BuildContext context) {
     return TreeIndentation(
       entry: entry,
-      child: Row(children: [
-        entry.hasChildren
-            ? IconButton(
-                onPressed: () => expandCallback(),
-                icon: entry.isExpanded
-                    ? const Icon(Icons.folder_open)
-                    : const Icon(Icons.folder))
-            : const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.label_important_outline),
-              ),
-        InkWell(
-          onTap: () => selectCallback(),
-          child: Text(
-            entry.node.name,
-            style: isSelected
-                ? const TextStyle(fontWeight: FontWeight.bold)
-                : const TextStyle(fontWeight: FontWeight.normal),
-          ),
-        ),
-        if (entry.node.runningHours != null && showRunningHours)
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(children: [
+          entry.hasChildren
+              ? IconButton(
+                  onPressed: () => expandCallback(),
+                  icon: entry.isExpanded
+                      ? const Icon(Icons.folder_open)
+                      : const Icon(Icons.folder))
+              : const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(Icons.label_important_outline),
+                ),
           InkWell(
-            onTap: () => _showRhUpdateDialog(context),
-            child: Text('   RH: ${entry.node.runningHours}'),
-          )
-      ]),
+            onTap: () => selectCallback(),
+            child: Text(
+              entry.node.name,
+              style: isSelected
+                  ? const TextStyle(fontWeight: FontWeight.bold)
+                  : const TextStyle(fontWeight: FontWeight.normal),
+            ),
+          ),
+          if (entry.node.runningHours != null && showRunningHours)
+            InkWell(
+              onTap: () => _showRhUpdateDialog(context),
+              child: Text('   RH: ${entry.node.runningHours}'),
+            ),
+          if (showOverview != null)
+            IconButton(
+              onPressed: showOverview,
+              icon: Image.asset("assets/overview.png", height: 20, width: 20),
+            ),
+        ]),
+      ),
     );
   }
 

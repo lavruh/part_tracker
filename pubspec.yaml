@@ -1,7 +1,7 @@
 name: part_tracker
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.5.6+1
+version: 1.5.7+1
 
 environment:
   sdk: '>=3.3.2 <4.0.0'
@@ -28,6 +28,7 @@ dependencies:
   permission_handler: ^12.0.0+1
   restart_app:
     git: https://github.com/lavruh/restart_app.git
+  markdown_widget: ^2.3.2+8
 
 dev_dependencies:
   flutter_test:
@@ -39,11 +40,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+   - assets/overview.png
+   - assets/help/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
