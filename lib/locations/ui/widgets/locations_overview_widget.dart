@@ -17,7 +17,7 @@ class LocationsOverviewWidget extends StatelessWidget {
       return AnimatedTreeView(
           treeController: treeController,
           nodeBuilder: (_, entry) {
-            return DragTarget(
+            return DragTarget<Part>(
               onAcceptWithDetails: (obj) => _processObj(obj, entry, state),
               builder: (context, _, __) {
                 return LocationWidget(
@@ -42,11 +42,8 @@ class LocationsOverviewWidget extends StatelessWidget {
     });
   }
 
-  _processObj(obj, entry, state) {
-    if (obj != null && obj.runtimeType == Part) {
-      final Part p = obj as Part;
-      state.movePartFromSelected(
-          partId: p.partNo, targetLocation: entry.node.id);
-    }
+  _processObj(DragTargetDetails<Part> obj, entry, state) {
+    final p = obj.data;
+    state.movePartFromSelected(partId: p.partNo, targetLocation: entry.node.id);
   }
 }
