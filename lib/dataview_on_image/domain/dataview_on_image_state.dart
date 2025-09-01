@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
@@ -8,18 +9,19 @@ import 'package:get/get.dart';
 import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_editor.dart';
 import 'package:part_tracker/dataview_on_image/ui/screens/dataview_on_image_screen.dart';
 import 'package:part_tracker/dataview_on_image/ui/widgets/dataview_on_image_settings_widget.dart';
-import 'package:part_tracker/utils/data/i_db_service.dart';
+import 'package:part_tracker/utils/domain/settings_repo.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 import 'package:part_tracker/utils/ui/widgets/question_dialog_widget.dart';
 
 class DataViewOnImageState extends GetxController {
   final _configs = <UniqueId, String>{}.obs;
   final _selectedConfig = <OverviewScreenConfig>[].obs;
+  UniqueId? selectedConfigLocationId;
   String selectedConfigPath = '';
   final data = <String, Map<String, String>>{}.obs;
   bool configChanged = false;
   final table = 'dataOnImageConfigs';
-  final IDbService _db = Get.find();
+  final _settings = Get.find<SettingsRepo>();
   final _fileProvider = Get.find<IFileProvider>();
 
   OverviewScreenConfig? get selectedConfig =>
@@ -53,13 +55,17 @@ class DataViewOnImageState extends GetxController {
 
   addConfig({required String configPath, required UniqueId locationId}) {
     _configs[locationId] = configPath;
+    final jsonString = _encodeConfigs();
+    _settings.setString(table, jsonString);
   }
 
   getConfigs() async {
-    await for (final map in _db.getAll(table: table)) {
-      final id = UniqueId.fromMap(map.keys.first);
-      addConfig(configPath: map[id.id], locationId: id);
-    }
+    final configsString = _settings.getString(table);
+    if (configsString == null) return;
+
+    final data = jsonDecode(configsString);
+    _configs.addAll(data.map<UniqueId, String>(
+        (key, value) => MapEntry(UniqueId(id: key), "$value")));
   }
 
   bool isConfigExist(UniqueId locationId) {
@@ -72,6 +78,7 @@ class DataViewOnImageState extends GetxController {
     required Map<String, Map<String, String>> data,
   }) async {
     final c = context;
+    selectedConfigLocationId = locationId;
     if (_configs.isEmpty) await getConfigs();
 
     if (!isConfigExist(locationId) && c.mounted) {
@@ -148,8 +155,10 @@ class DataViewOnImageState extends GetxController {
     return false;
   }
 
-  selectConfigFile(UniqueId locationId, BuildContext context) async {
+  selectConfigFile(BuildContext context) async {
+    final locationId = selectedConfigLocationId;
     try {
+      if (locationId == null) throw Exception('Location is not selected');
       final f = await _fileProvider.selectFile(
           context: context,
           title: 'Select config file',
@@ -157,7 +166,6 @@ class DataViewOnImageState extends GetxController {
 
       final path = f.path;
       addConfig(configPath: path, locationId: locationId);
-      _db.update(id: locationId.id, item: {locationId.id: path}, table: table);
     } catch (e) {
       Get.defaultDialog(middleText: "$e");
     }
@@ -170,22 +178,18 @@ class DataViewOnImageState extends GetxController {
             'Config file not found.\n Yes to create new,\n No select existing file.');
     if (act != null && c.mounted) {
       if (act) {
-        await _createConfigFile(locationId, context);
+        await _createConfigFile(context);
       } else {
-        await selectConfigFile(locationId, context);
+        await selectConfigFile(context);
       }
     }
   }
 
-  Future<void> _createConfigFile(
-      UniqueId locationId, BuildContext context) async {
+  Future<void> _createConfigFile(BuildContext context) async {
     final c = context;
+    final locationId = selectedConfigLocationId;
     try {
-      // final img = await _fileProvider.selectFile(
-      //     context: context,
-      //     title: 'Select image file',
-      //     allowedExtensions: ['jpg', 'jpeg', 'png']);
-      // final imgPath = img.path;
+      if (locationId == null) throw Exception('Location is not selected');
       final conf = OverviewScreenConfig(path: "", viewPorts: {});
       if (!c.mounted) return;
       final file = await _fileProvider.selectFile(
@@ -196,7 +200,6 @@ class DataViewOnImageState extends GetxController {
       final path = file.path;
       File(path).writeAsStringSync(conf.toJson());
       addConfig(configPath: path, locationId: locationId);
-      _db.update(id: locationId.id, item: {locationId.id: path}, table: table);
       showConfigEditor();
     } on Exception catch (e) {
       Get.defaultDialog(middleText: "$e");
@@ -217,5 +220,10 @@ class DataViewOnImageState extends GetxController {
 
   Future<File> selectFile(BuildContext context, String title) async {
     return _fileProvider.selectFile(context: context, title: title);
+  }
+
+  String _encodeConfigs() {
+    final data = _configs.map<String, String>((k, v) => MapEntry(k.id, v));
+    return jsonEncode(data);
   }
 }

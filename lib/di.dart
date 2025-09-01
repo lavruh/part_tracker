@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_provider/file_provider.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -13,13 +15,14 @@ import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
 import 'package:part_tracker/utils/data/sembast_db_service.dart';
+import 'package:part_tracker/utils/domain/settings_repo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
 
 Future<bool> initDependencies() async {
   try {
-    final pref =
-        Get.put<SharedPreferences>(await SharedPreferences.getInstance());
+    final pref = await SharedPreferences.getInstance();
+
     Get.put<IFileProvider>(FileProvider.getInstance());
     final path = pref.getString('dbPath');
     if (path == null) {
@@ -28,6 +31,16 @@ Future<bool> initDependencies() async {
     final dirName = Get.put<String>(p.dirname(path), tag: 'dirName');
     final db = Get.put<IDbService>(SembastDbService());
     await db.init(dbName: 'part_tracker', dbPath: path);
+
+    final settingsPath = p.join(dirName, "settings.db");
+    final settingsFile = File(settingsPath);
+    if(!settingsFile.existsSync()) settingsFile.createSync(recursive: true);
+
+   final settingsDb = SembastDbService();
+    await settingsDb.init(dbName: 'settings', dbPath: settingsPath);
+    final settings = Get.put<SettingsRepo>(SettingsRepo(settingsDb));
+    await settings.loadSettings();
+
     Get.put(BackupState(ZipBackupService(dirName)));
     final log = Get.put(LogbookState());
     log.getAll();

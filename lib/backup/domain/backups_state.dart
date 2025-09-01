@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:part_tracker/backup/data/i_backup_service.dart';
 import 'package:part_tracker/backup/domain/entities/backup_item.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:part_tracker/utils/domain/settings_repo.dart';
 
 class BackupState extends GetxController {
   final availableBackups = <BackupItem>[].obs;
@@ -11,7 +11,7 @@ class BackupState extends GetxController {
   final IBackupService _service;
   final _amountOfStepsToKeep = 0.obs;
   final table = 'backups';
-  final _settings = Get.find<SharedPreferences>();
+  final _settings = Get.find<SettingsRepo>();
 
   BackupState(this._service) {
     amountOfSteps = _settings.getInt('amountOfSteps') ?? 0;
