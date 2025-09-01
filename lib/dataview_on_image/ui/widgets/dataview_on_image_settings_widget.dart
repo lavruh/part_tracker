@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
-import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/utils/ui/widgets/editor_widget.dart';
 
 class DataViewOnImageSettingsWidget extends StatelessWidget {
@@ -49,10 +48,12 @@ class DataViewOnImageSettingsWidget extends StatelessWidget {
     });
   }
 
-  void _selectConfigFile(DataViewOnImageState state, BuildContext context) {
-    final locationId = Get.find<LocationsMenuState>().selectedLocation?.id;
+  void _selectConfigFile(DataViewOnImageState state, BuildContext context) async{
+    final state = Get.find<DataViewOnImageState>();
+    final locationId = state.selectedConfigLocationId;
     if (locationId != null) {
-      state.selectConfigFile(locationId, context);
+      await state.selectConfigFile(context);
+      Get.back();
     }
   }
 }
