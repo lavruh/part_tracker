@@ -36,7 +36,15 @@ class MainScreenLoader extends StatelessWidget {
                 setAppDB(context);
               });
             }
-            return Scaffold(body: Center(child: Text(errString)));
+            return Scaffold(
+                body: Center(
+                    child: Column(
+              children: [
+                Text(errString),
+                TextButton(
+                    onPressed: () => setAppDB(context), child: Text("Set db")),
+              ],
+            )));
           }
           if (loaded != null && loaded == true) {
             if (Platform.isLinux || Platform.isWindows) {
