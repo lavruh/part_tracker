@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_provider/file_provider.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:part_tracker/backup/data/zip_backup_service.dart';
 import 'package:part_tracker/backup/domain/backups_state.dart';
@@ -22,6 +23,7 @@ import 'package:path/path.dart' as p;
 Future<bool> initDependencies() async {
   try {
     final pref = await SharedPreferences.getInstance();
+    Get.put<SharedPreferences>(pref);
 
     Get.put<IFileProvider>(FileProvider.getInstance());
     final path = pref.getString('dbPath');
@@ -34,14 +36,19 @@ Future<bool> initDependencies() async {
 
     final settingsPath = p.join(dirName, "settings.db");
     final settingsFile = File(settingsPath);
-    if(!settingsFile.existsSync()) settingsFile.createSync(recursive: true);
+    if (!settingsFile.existsSync()) settingsFile.createSync(recursive: true);
 
-   final settingsDb = SembastDbService();
+    final settingsDb = SembastDbService();
     await settingsDb.init(dbName: 'settings', dbPath: settingsPath);
     final settings = Get.put<SettingsRepo>(SettingsRepo(settingsDb));
     await settings.loadSettings();
 
-    Get.put(BackupState(ZipBackupService(dirName)));
+    final backupState = BackupState(ZipBackupService(dirName));
+    Get.put<BackupState>(backupState);
+    
+    final now = DateTime.now();
+    backupState.createBackup(description: DateFormat("yyyy-MM-dd_HH-mm-ss").format(now));
+    
     final log = Get.put(LogbookState());
     log.getAll();
     Get.lazyPut(() => DataViewOnImageState());

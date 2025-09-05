@@ -180,7 +180,7 @@ class LocationManagerState extends GetxController {
     required UniqueId sourceLocation,
     required UniqueId targetLocation,
   }) async {
-    final partsManager = Get.find<PartsManagerState>();
+    // final partsManager = Get.find<PartsManagerState>();
     final target = locations[targetLocation];
     if (target == null) {
       throw LocationManagerException('Invalid source or target location');
@@ -238,9 +238,9 @@ class LocationManagerState extends GetxController {
         List<UniqueId> tmp = source.parts;
         tmp.removeWhere((e) => e.id == partId.id);
         updateLocation(source.copyWith(parts: tmp));
-        if (source.runningHours != null) {
+        // if (source.runningHours != null) {
           rhSpendOnLocation = partsManager.clearPartCurrentRunningHours(partId);
-        }
+        // }
       }
     }
 
