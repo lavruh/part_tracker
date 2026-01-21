@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 env:
-  APP_NAME: part_tracker
+  APP_NAME: ${{ vars.APP_NAME }}
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.32.0'
+          flutter-version: ${{ vars.FLUTTER_VERSION }}
 
       - name: Install project dependencies
         run: flutter pub get
