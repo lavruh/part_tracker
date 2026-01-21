@@ -6,12 +6,32 @@ import 'package:get/get.dart';
 import 'package:part_tracker/di.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen.dart';
 import 'package:part_tracker/locations/ui/screens/locations_overview_screen_mobile.dart';
+import 'package:part_tracker/utils/data/db_lock_manager.dart';
 import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (await isPermissionsGranted() == false) return;
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = WindowOptions(
+    center: true,
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.normal,
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.maximize();
+    await windowManager.focus();
+  });
+  final customWindowListener = CustomWindowListener();
+  windowManager.addListener(customWindowListener);
+
   runApp(GetMaterialApp(
     theme: ThemeData(primarySwatch: Colors.grey),
     home: const MainScreenLoader(),
@@ -68,4 +88,9 @@ Future<bool> isPermissionsGranted() async {
     fl = await Permission.manageExternalStorage.request().isGranted;
   }
   return fl;
+}
+
+class CustomWindowListener extends WindowListener {
+  @override
+  void onWindowClose() => Get.find<DBLockManager>().removeLock();
 }
