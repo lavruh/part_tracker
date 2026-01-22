@@ -7,7 +7,7 @@ jobs:
     name: flutter release apk
     runs-on: ubuntu-latest
     env:
-      APP_NAME: part_tracker
+      APP_NAME: ${{ vars.APP_NAME }}
       BUILD_PATH: build/app/outputs/flutter-apk/
 
     steps:
@@ -21,7 +21,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.32.0'
+          flutter-version: ${{ vars.FLUTTER_VERSION }}
 
       - name: Clean project dependencies
         run: flutter clean

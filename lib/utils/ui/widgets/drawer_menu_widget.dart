@@ -43,7 +43,9 @@ class DrawerMenuWidget extends StatelessWidget {
               }),
           ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Set app db file'),
+              title: const Text('Change current db file'),
+              subtitle: Text(Get.find<String>(tag: 'dbPath'),
+                  style: const TextStyle(color: Colors.grey)),
               onTap: () => setAppDB(context)),
           ListTile(
               leading: const Icon(Icons.backup),
