@@ -15,36 +15,59 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (await isPermissionsGranted() == false) return;
 
-  WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
+  if (!Platform.isAndroid) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = WindowOptions(
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.normal,
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.maximize();
-    await windowManager.focus();
-  });
-  final customWindowListener = CustomWindowListener();
-  windowManager.addListener(customWindowListener);
-
+    WindowOptions windowOptions = WindowOptions(
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.normal,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.maximize();
+      await windowManager.focus();
+    });
+    final customWindowListener = CustomWindowListener();
+    windowManager.addListener(customWindowListener);
+  }
   runApp(GetMaterialApp(
     theme: ThemeData(primarySwatch: Colors.grey),
     home: const MainScreenLoader(),
   ));
 }
 
-class MainScreenLoader extends StatelessWidget {
+class MainScreenLoader extends StatefulWidget {
   const MainScreenLoader({super.key});
+
+  @override
+  State<MainScreenLoader> createState() => _MainScreenLoaderState();
+}
+
+class _MainScreenLoaderState extends State<MainScreenLoader> {
+  late final AppLifecycleListener _listener;
+
+  @override
+  void initState() {
+    super.initState();
+    _listener = AppLifecycleListener(
+      onDetach: () => Get.find<DBLockManager>().removeLock(),
+      onRestart: () => Get.find<DBLockManager>().removeLock(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _listener.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        key: key,
+        key: widget.key,
         future: initDependencies(),
         builder: (context, r) {
           final loaded = r.data;
