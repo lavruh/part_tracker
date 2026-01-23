@@ -4,6 +4,8 @@ import 'package:file_provider/file_provider.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:part_tracker/attachments/data/local_attachments_service.dart';
+import 'package:part_tracker/attachments/domain/attachments_state.dart';
 import 'package:part_tracker/backup/data/zip_backup_service.dart';
 import 'package:part_tracker/backup/domain/backups_state.dart';
 import 'package:part_tracker/dataview_on_image/domain/dataview_on_image_state.dart';
@@ -56,6 +58,7 @@ Future<bool> initDependencies() async {
     backupState.createBackup(
         description: DateFormat("yyyy-MM-dd_HH-mm-ss").format(now));
 
+    Get.put(AttachmentsState(LocalAttachmentsService()));
     final log = Get.put(LogbookState());
     log.getAll();
     Get.lazyPut(() => DataViewOnImageState());

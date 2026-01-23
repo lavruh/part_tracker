@@ -1,7 +1,7 @@
 name: part_tracker
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.5.12+1
+version: 1.5.13+1
 
 environment:
   sdk: '>=3.3.2 <4.0.0'
@@ -30,6 +30,8 @@ dependencies:
     git: https://github.com/lavruh/restart_app.git
   markdown_widget: ^2.3.2+8
   device_info_plus: ^12.3.0
+  popover: ^0.4.0
+  open_file: ^3.5.11
 
 dev_dependencies:
   flutter_test:
