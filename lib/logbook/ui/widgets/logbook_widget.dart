@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:part_tracker/attachments/ui/attachments_widget.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
 
 class LogBookWidget extends StatelessWidget {
-  const LogBookWidget({Key? key}) : super(key: key);
+  const LogBookWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +39,17 @@ class LogBookWidget extends StatelessWidget {
                 final d = DateFormat('y-MM-dd HH:mm').format(e.date);
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "$d  ${e.entry}",
-                    maxLines: 3,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: SelectableText("$d  ${e.entry}"),
+                      ),
+                      AttachmentsWidget(
+                        attachments: e.attachments,
+                        ownerId: e.id,
+                      ),
+                    ],
                   ),
                 );
               }).toList(),

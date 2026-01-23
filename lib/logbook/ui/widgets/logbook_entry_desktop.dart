@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:part_tracker/attachments/ui/attachments_editor_button.dart';
 import 'package:part_tracker/logbook/domain/entities/log_entry.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
 import 'package:part_tracker/utils/ui/widgets/text_input_dialog_widget.dart';
@@ -38,9 +39,18 @@ class LogbookEntryDesktop extends StatelessWidget {
                   update: (text) {
                     state.updateLogEntry(entry.copyWith(entry: text));
                   }),
-              child: Text(entry.entry, maxLines: 2, overflow: TextOverflow.clip),
+              child:
+                  Text(entry.entry, maxLines: 2, overflow: TextOverflow.clip),
             ),
           ),
+          Flexible(
+              child: AttachmentsEditorButton(
+            logEntryId: entry.id,
+            attachments: entry.attachments,
+            update: (val) {
+              state.updateLogEntry(entry.copyWith(attachments: val));
+            },
+          )),
         ],
       ),
     );
