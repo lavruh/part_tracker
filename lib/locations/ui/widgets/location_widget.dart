@@ -12,12 +12,14 @@ class LocationWidget extends StatelessWidget {
     required this.selectCallback,
     required this.isSelected,
     required this.showRunningHours,
+    required this.hasPartsDueToMaintenance,
     required this.updateRunningHours,
     this.showOverview,
   });
   final TreeEntry<Location> entry;
   final bool isSelected;
   final bool showRunningHours;
+  final bool hasPartsDueToMaintenance;
   final Function expandCallback;
   final Function selectCallback;
   final Function(RunningHours) updateRunningHours;
@@ -25,6 +27,8 @@ class LocationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = hasPartsDueToMaintenance ? Colors.red : Colors.black;
+
     return TreeIndentation(
       entry: entry,
       child: SingleChildScrollView(
@@ -45,8 +49,8 @@ class LocationWidget extends StatelessWidget {
             child: Text(
               entry.node.name,
               style: isSelected
-                  ? const TextStyle(fontWeight: FontWeight.bold)
-                  : const TextStyle(fontWeight: FontWeight.normal),
+                  ? TextStyle(fontWeight: FontWeight.bold, color: titleColor)
+                  : TextStyle(fontWeight: FontWeight.normal, color: titleColor),
             ),
           ),
           if (entry.node.runningHours != null && showRunningHours)

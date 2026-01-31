@@ -3,7 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
+import 'package:part_tracker/maintenance/domain/maintenance_notifier.dart';
+import 'package:part_tracker/maintenance/ui/maintenance_info_overview.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+
+const bold = TextStyle(fontWeight: FontWeight.bold);
 
 class PartWidget extends StatelessWidget {
   const PartWidget(
@@ -11,23 +15,32 @@ class PartWidget extends StatelessWidget {
       required this.item,
       required this.onTap,
       required this.partSelected,
-      required this.widgetMaxHeight});
+      required this.widgetMaxHeight})
+      : style = partSelected ? bold : null;
   final Part item;
   final Function onTap;
   final bool partSelected;
   final double widgetMaxHeight;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
     Widget child = _ChildDesktop(
-        item: item, selected: partSelected, widgetMaxHeight: widgetMaxHeight);
+        item: item,
+        style: style,
+        widgetMaxHeight: widgetMaxHeight,
+        runningHoursAtLocationProvider: _runningHoursAtLocationProvider);
     Widget result = Draggable(
         data: item,
         feedback: Card(child: child),
         child: InkWell(onTapUp: (_) => onTap(), child: child));
     if (Platform.isAndroid) {
       child = _ChildMobile(
-          item: item, selected: partSelected, widgetMaxHeight: widgetMaxHeight);
+        item: item,
+        style: style,
+        widgetMaxHeight: widgetMaxHeight,
+        runningHoursAtLocationProvider: _runningHoursAtLocationProvider,
+      );
       result = LongPressDraggable(
         data: item,
         feedback: Card(child: child),
@@ -39,22 +52,40 @@ class PartWidget extends StatelessWidget {
     }
     return result;
   }
+
+  Widget _runningHoursAtLocationProvider(BuildContext context) {
+    final maintenanceNotifier = Get.find<MaintenanceNotifier>();
+    final isPartDueToMaintenance =
+        maintenanceNotifier.isPartDueToMaintenance(item.partNo);
+    return InkWell(
+      onTap: () {
+        if (isPartDueToMaintenance) {
+          Get.defaultDialog(
+              title: "Necessary Maintenance:",
+              content: MaintenanceInfoOverview(part: item));
+        }
+      },
+      child: Text('${item.runningHoursAtLocation.value}',
+          style: isPartDueToMaintenance
+              ? bold.copyWith(color: Colors.red)
+              : style),
+    );
+  }
 }
 
 class _ChildDesktop extends StatelessWidget {
   const _ChildDesktop(
-      {super.key,
-      required this.item,
-      required this.selected,
-      required this.widgetMaxHeight});
+      {required this.item,
+      required this.style,
+      required this.widgetMaxHeight,
+      required this.runningHoursAtLocationProvider});
   final Part item;
-  final bool selected;
-  static const bold = TextStyle(fontWeight: FontWeight.bold);
+  final TextStyle? style;
   final double widgetMaxHeight;
+  final Widget Function(BuildContext) runningHoursAtLocationProvider;
 
   @override
   Widget build(BuildContext context) {
-    final style = selected ? bold : null;
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.45,
       height: widgetMaxHeight,
@@ -74,8 +105,7 @@ class _ChildDesktop extends StatelessWidget {
                 child: Text('${item.runningHours.value}', style: style)),
             ConstrainedBox(
                 constraints: const BoxConstraints(minWidth: 75),
-                child:
-                    Text('${item.runningHoursAtLocation.value}', style: style)),
+                child: runningHoursAtLocationProvider(context)),
             Flexible(
               child:
                   Text(item.remarks, style: style, overflow: TextOverflow.fade),
@@ -89,18 +119,17 @@ class _ChildDesktop extends StatelessWidget {
 
 class _ChildMobile extends StatelessWidget {
   const _ChildMobile(
-      {super.key,
-      required this.item,
-      required this.selected,
-      required this.widgetMaxHeight});
+      {required this.item,
+      required this.style,
+      required this.widgetMaxHeight,
+      required this.runningHoursAtLocationProvider});
   final Part item;
-  final bool selected;
-  static const bold = TextStyle(fontWeight: FontWeight.bold);
+  final TextStyle? style;
   final double widgetMaxHeight;
+  final Widget Function(BuildContext) runningHoursAtLocationProvider;
 
   @override
   Widget build(BuildContext context) {
-    final style = selected ? bold : null;
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.45,
       // height: widgetMaxHeight,
@@ -125,8 +154,7 @@ class _ChildMobile extends StatelessWidget {
                   flex: 2,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Text('${item.runningHoursAtLocation.value}',
-                        style: style),
+                    child: runningHoursAtLocationProvider(context),
                   ),
                 ),
               ],

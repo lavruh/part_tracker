@@ -21,7 +21,6 @@ class LocationManagerState extends GetxController {
 
   LocationManagerState() {
     _setTreeController();
-    getAllLocations();
   }
 
   TreeController<Location> get treeController => _treeController;
@@ -79,7 +78,9 @@ class LocationManagerState extends GetxController {
   }
 
   void _updateLocationAndSubLocations(
-      Location location, RunningHours? rhDiff) async {
+    Location location,
+    RunningHours? rhDiff,
+  ) async {
     updateLocation(location);
 
     if (location.parts.isNotEmpty && rhDiff != null) {
@@ -135,7 +136,8 @@ class LocationManagerState extends GetxController {
     if (locations.containsKey(parentId)) {
       return locations[parentId]!;
     } else {
-      throw LocationManagerException('Item <$parentId> does not exist');
+      throw LocationManagerException(
+          '[ln 139]getParentLocation: Item <$parentId> does not exist');
     }
   }
 
@@ -180,15 +182,15 @@ class LocationManagerState extends GetxController {
     required UniqueId sourceLocation,
     required UniqueId targetLocation,
   }) async {
-    // final partsManager = Get.find<PartsManagerState>();
     final target = locations[targetLocation];
     if (target == null) {
-      throw LocationManagerException('Invalid source or target location');
+      throw LocationManagerException(
+          'moveAllPartsOfTypeToLocation: Invalid source or target location');
     }
     for (final type in partTypes) {
       if (!target.allowedPartTypes.containsKey(type)) {
         throw LocationManagerException(
-            'Part type[$type] is not suitable for target location');
+            'moveAllPartsOfTypeToLocation: Part type[$type] is not suitable for target location');
       }
     }
   }
@@ -238,9 +240,10 @@ class LocationManagerState extends GetxController {
         List<UniqueId> tmp = source.parts;
         tmp.removeWhere((e) => e.id == partId.id);
         updateLocation(source.copyWith(parts: tmp));
-        // if (source.runningHours != null) {
-          rhSpendOnLocation = partsManager.clearPartCurrentRunningHours(partId);
-        // }
+        rhSpendOnLocation = partsManager.clearPartCurrentRunningHours(
+          partId,
+          installationRunningHours: target.runningHours,
+        );
       }
     }
 
@@ -319,14 +322,35 @@ class LocationManagerState extends GetxController {
 
   selectLocationContainingPart({required UniqueId partId}) {
     try {
-      final location = locations.values
-          .firstWhere((location) => location.parts.contains(partId));
+      final location = getLocationContainingPart(partId: partId);
       _selectLocation(location);
       _expandTillSelected();
     } on StateError catch (_) {
       Get.defaultDialog(
-          title: '', middleText: 'No Location containing [$partId] found');
+          title: '',
+          middleText:
+              '[ln 328]selectLocationContainingPart: No Location containing [$partId] found');
     }
+  }
+
+  Location getLocationContainingPart({required UniqueId partId}) {
+    try {
+      return locations.values
+          .firstWhere((location) => location.parts.contains(partId));
+    } on StateError catch (_) {
+      throw LocationManagerException(
+          'getLocationContainingPart: No Location containing [$partId] found');
+    }
+  }
+
+  List<UniqueId> getParentLocationsTreeIds(UniqueId locationId) {
+    final location = locations[locationId];
+    if (location == null) return [];
+    final parentId = location.parentLocation;
+    if (parentId == null) return [];
+    final parent = locations[parentId];
+    if (parent == null) return [];
+    return [parentId, ...getParentLocationsTreeIds(parentId)];
   }
 
   void showLocations() => pageController.jumpTo(0);

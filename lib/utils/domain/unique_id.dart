@@ -4,6 +4,8 @@ class UniqueId {
   final String id;
   UniqueId({String? id}) : id = id ?? generate();
 
+  const UniqueId.empty() : id = "";
+
   static String generate() => DateTime.now().millisecondsSinceEpoch.toString();
 
   String toMap() {

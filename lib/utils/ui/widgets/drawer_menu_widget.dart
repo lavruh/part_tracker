@@ -6,6 +6,7 @@ import 'package:part_tracker/backup/ui/screens/backups_dialog.dart';
 import 'package:part_tracker/help/ui/screens/help_screen.dart';
 import 'package:part_tracker/logbook/ui/screens/logbook_overview_screen.dart';
 import 'package:part_tracker/logbook/ui/widgets/logbook_overview_dialog.dart';
+import 'package:part_tracker/maintenance/ui/maintenance_plans_overview_screen.dart';
 import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
 
 class DrawerMenuWidget extends StatelessWidget {
@@ -53,6 +54,15 @@ class DrawerMenuWidget extends StatelessWidget {
               onTap: () {
                 Get.defaultDialog(
                     title: 'Backups', content: const BackupsDialogWidget());
+              }),
+          ListTile(
+              leading: const Icon(Icons.today_outlined),
+              title: const Text('Maintenance'),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
+                      return MaintenancePlansOverviewScreen();
+                }));
               }),
           ListTile(
               leading: const Icon(Icons.help),

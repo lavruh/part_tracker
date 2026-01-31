@@ -1,10 +1,13 @@
+import 'package:part_tracker/utils/domain/mappers.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class PartType {
   final UniqueId id;
   final String name;
+  final List<UniqueId> maintenancePlans;
 
-  PartType({required this.id, required this.name});
+  PartType(
+      {required this.id, required this.name, required this.maintenancePlans});
 
   @override
   String toString() {
@@ -13,7 +16,8 @@ class PartType {
 
   PartType.empty()
       : id = UniqueId(),
-        name = '';
+        name = '',
+        maintenancePlans = [];
 
   @override
   bool operator ==(Object other) =>
@@ -26,10 +30,12 @@ class PartType {
   PartType copyWith({
     UniqueId? id,
     String? name,
+    List<UniqueId>? maintenancePlans,
   }) {
     return PartType(
       id: id ?? this.id,
       name: name ?? this.name,
+      maintenancePlans: maintenancePlans ?? this.maintenancePlans,
     );
   }
 
@@ -37,13 +43,14 @@ class PartType {
     return {
       'id': id.id,
       'name': name,
+      'maintenancePlans': maintenancePlans.map((e) => e.toMap()).toList(),
     };
   }
 
   factory PartType.fromMap(Map<String, dynamic> map) {
     return PartType(
-      id: UniqueId(id: map['id']),
-      name: map['name'] as String,
-    );
+        id: UniqueId(id: map['id']),
+        name: map['name'] as String,
+        maintenancePlans: mapUniqueIdList(map['maintenancePlans']));
   }
 }

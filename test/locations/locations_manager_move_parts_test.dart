@@ -7,6 +7,7 @@ import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
+import 'package:part_tracker/maintenance/domain/maintenance_notifier.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/parts/domain/part_editor_state.dart';
@@ -40,6 +41,7 @@ main() {
     when(dbMock.getAll(table: 'locations'))
         .thenAnswer((_) => const Stream.empty());
     when(dbMock.getAll(table: 'parts')).thenAnswer((_) => const Stream.empty());
+    Get.put(MaintenanceNotifier());
     Get.put<LocationEditorState>(MockLocationEditorState());
     Get.put<LocationsMenuState>(MockLocationsMenuState());
     Get.put<PartEditorState>(MockPartEditorState());

@@ -9,7 +9,9 @@ import 'package:part_tracker/locations/domain/location_editor_state.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
+import 'package:part_tracker/maintenance/domain/maintenance_notifier.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
+import 'package:part_tracker/part_types/domain/part_types_state.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/parts/domain/part_editor_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
@@ -23,7 +25,7 @@ import '../mocks.dart';
 
 import 'locations_manager_test.mocks.dart';
 
-@GenerateMocks([IDbService, BackupState])
+@GenerateMocks([IDbService])
 void main() {
   late ZipBackupService zip;
   late MemoryFileSystem fs;
@@ -41,12 +43,15 @@ void main() {
     when(dbMock.getAll(table: 'locations'))
         .thenAnswer((_) => const Stream.empty());
     when(dbMock.getAll(table: 'parts')).thenAnswer((_) => const Stream.empty());
+    when(dbMock.getAll(table: 'maintenance_plans')).thenAnswer((_) => const Stream.empty());
     Get.put(LogbookState());
     Get.put(LocationEditorState());
     Get.put(LocationsMenuState());
+    Get.put(PartTypesState());
     Get.put(PartEditorState());
-    partsManagerState = Get.put(PartsManagerState());
     sut = Get.put(LocationManagerState());
+    Get.put(MaintenanceNotifier());
+    partsManagerState = Get.put(PartsManagerState());
     location = Location.empty(name: 'test location');
   });
 

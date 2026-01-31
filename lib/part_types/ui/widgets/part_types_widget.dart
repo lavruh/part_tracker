@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/part_types/domain/part_types_state.dart';
+import 'package:part_tracker/part_types/ui/widgets/part_type_editor_widget.dart';
 import 'package:part_tracker/part_types/ui/widgets/qty_edit_dialog.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
-import 'package:part_tracker/utils/ui/widgets/text_input_dialog_widget.dart';
 
 class PartTypesWidget extends StatelessWidget {
   const PartTypesWidget(
-      {Key? key,
+      {super.key,
       required this.selected,
       required this.updateSelected,
-      this.requestQty = true})
-      : super(key: key);
+      this.requestQty = true});
   final Map<UniqueId, int?> selected;
   final Function(Map<UniqueId, int?>) updateSelected;
   final bool requestQty;
@@ -28,12 +27,15 @@ class PartTypesWidget extends StatelessWidget {
                         ? InputChip(
                             label: Text(e.name),
                             onDeleted: () => state.removePartType(e.id),
-                            onPressed: () => _showNameEditDialog(
-                              initName: e.name,
-                              update: (val) {
-                                state.updatePartType(e.copyWith(name: val));
-                              },
-                            ),
+                            onPressed: () {
+                              Get.defaultDialog(
+                                  title: "Part type [edit]",
+                                  content: PartTypeEditorWidget(
+                                      partType: e,
+                                      onConfirm: (val){
+                                        state.updatePartType(val);
+                                      }));
+                            },
                           )
                         : InputChip(
                             label: Text("${e.name}${_getQty(e.id)}"),
@@ -117,14 +119,6 @@ class PartTypesWidget extends StatelessWidget {
       selected.putIfAbsent(e.id, () => 0);
     }
     updateSelected(selected);
-  }
-
-  _showNameEditDialog(
-      {required String initName, required Function(String) update}) async {
-    final text = await textInputDialogWidget(initName: initName);
-    if (text != null) {
-      update(text);
-    }
   }
 
   String _getQty(UniqueId id) {
