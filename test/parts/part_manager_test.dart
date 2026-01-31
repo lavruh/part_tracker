@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
+import 'package:part_tracker/maintenance/domain/maintenance_notifier.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/parts/domain/part_editor_state.dart';
@@ -27,6 +28,7 @@ void main() {
       when(dbMock.getAll(table: 'parts'))
           .thenAnswer((_) => const Stream.empty());
       final editorMock = MockPartEditorState();
+      Get.put(MaintenanceNotifier());
       Get.put<LocationsMenuState>(MockLocationsMenuState());
       Get.put<PartEditorState>(editorMock);
       Get.put<LogbookState>(MockLogbookState());
@@ -103,12 +105,14 @@ void main() {
           partNo: UniqueId(id: 'p1'),
           type: type,
           runningHours: RunningHours(10),
+          installationRh: RunningHours(1),
           remarks: '',
           runningHoursAtLocation: RunningHours(0));
       final part2 = Part(
           partNo: UniqueId(id: 'p2'),
           type: type,
           runningHours: RunningHours(15),
+          installationRh: RunningHours(1),
           remarks: '',
           runningHoursAtLocation: RunningHours(0));
       final partIds = [part1.partNo, part2.partNo];

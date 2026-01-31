@@ -4,7 +4,7 @@ import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/parts/domain/parts_manager_state.dart';
 
 class PartsMenuBarWidget extends StatelessWidget {
-  const PartsMenuBarWidget({Key? key}) : super(key: key);
+  const PartsMenuBarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class PartsMenuBarWidget extends StatelessWidget {
       ];
       final partEditMenu = <Widget>[
         IconButton(
-            onPressed: () => state.updateRemarksSelectedPart(),
+            onPressed: () => state.updateSelectedPart(),
             icon: const Icon(Icons.edit_note)),
         IconButton(
             onPressed: () => state.deleteSelectedPart(),

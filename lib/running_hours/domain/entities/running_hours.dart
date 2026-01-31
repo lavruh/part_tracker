@@ -15,6 +15,8 @@ class RunningHours {
     required this.date,
   });
 
+  RunningHours.atTime({required this.value, required this.date});
+
   factory RunningHours(int val) =>
       RunningHours._constructor(value: val, date: DateTime.now());
 

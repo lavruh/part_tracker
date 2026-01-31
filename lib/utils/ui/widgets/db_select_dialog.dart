@@ -24,14 +24,18 @@ setAppDB(BuildContext context) async {
       if (!file.existsSync()) {
         file.createSync();
       }
-      Get.find<DBLockManager>().removeLock();
-      Restart.restartApp(
-        notificationBody: "Restart App",
-        notificationTitle: "DB loaded from $path",
-      );
+      restartApplication("DB loaded from $path");
     }
   } catch (e) {
     Get.defaultDialog(middleText: "$e");
     return;
   }
+}
+
+void restartApplication(String msg){
+  Get.find<DBLockManager>().removeLock();
+  Restart.restartApp(
+    notificationBody: "Restart App",
+    notificationTitle: msg,
+  );
 }

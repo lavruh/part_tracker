@@ -3,6 +3,7 @@ import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/ui/widgets/location_widget.dart';
+import 'package:part_tracker/maintenance/domain/maintenance_notifier.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 
 class LocationsOverviewWidget extends StatelessWidget {
@@ -13,6 +14,8 @@ class LocationsOverviewWidget extends StatelessWidget {
     return GetX<LocationManagerState>(builder: (state) {
       state.getSubLocations(null); //this line to force getx to work
 
+      final maintenanceNotifier = Get.find<MaintenanceNotifier>();
+
       final treeController = state.treeController;
       return AnimatedTreeView(
           treeController: treeController,
@@ -20,21 +23,27 @@ class LocationsOverviewWidget extends StatelessWidget {
             return DragTarget<Part>(
               onAcceptWithDetails: (obj) => _processObj(obj, entry, state),
               builder: (context, _, __) {
+                final location = entry.node;
+
+                final hasPartsDueToMaintenance =
+                    maintenanceNotifier.isDueToMaintenance(location.id);
+
                 return LocationWidget(
                   entry: entry,
                   expandCallback: () =>
-                      treeController.toggleExpansion(entry.node),
+                      treeController.toggleExpansion(location),
                   selectCallback: () {
-                    state.toggleLocationSelection(entry.node);
+                    state.toggleLocationSelection(location);
                   },
                   updateRunningHours: (val) {
                     state.updateLocationRunningHours(
-                        locationId: entry.node.id, rh: val);
+                        locationId: location.id, rh: val);
                   },
-                  isSelected: state.isLocationSelected(entry.node),
-                  showRunningHours: state.showLocationRunningHours(entry.node),
+                  isSelected: state.isLocationSelected(location),
+                  hasPartsDueToMaintenance: hasPartsDueToMaintenance,
+                  showRunningHours: state.showLocationRunningHours(location),
                   showOverview:
-                      state.getOverviewShowCallback(context, entry.node),
+                      state.getOverviewShowCallback(context, location),
                 );
               },
             );

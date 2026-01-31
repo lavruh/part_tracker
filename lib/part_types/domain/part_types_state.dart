@@ -9,16 +9,12 @@ class PartTypesState extends GetxController {
   final _tableName = 'part_types';
   final _editMode = false.obs;
 
-  PartTypesState() {
-    getAll();
-  }
-
   bool get isEditMode => _editMode.value;
 
   toggleMode() => _editMode.value = !_editMode.value;
 
   createPartType() {
-    updatePartType(PartType(id: UniqueId(), name: ''));
+    updatePartType(PartType.empty());
   }
 
   updatePartType(PartType type) {
@@ -36,5 +32,11 @@ class PartTypesState extends GetxController {
   removePartType(UniqueId id) {
     types.remove(id);
     db.delete(id: id.toString(), table: _tableName);
+  }
+
+  PartType getTypeById(UniqueId id){
+    final type = types[id];
+    if(type == null) throw Exception("Part type with id[$id] does not exist.");
+    return type;
   }
 }

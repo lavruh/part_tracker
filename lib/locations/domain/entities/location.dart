@@ -1,4 +1,5 @@
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
+import 'package:part_tracker/utils/domain/mappers.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class Location {
@@ -79,7 +80,7 @@ class Location {
       final i = mapAllowedPT[key];
       allowedPT.putIfAbsent(UniqueId.fromMap(key), () => i);
     }
-    // print(map['allowedPartTypes']);
+
 
     return Location(
       id: UniqueId(id: map['id']),
@@ -88,7 +89,7 @@ class Location {
       parentLocation: map['parentLocation'] != null
           ? UniqueId(id: map['parentLocation'])
           : null,
-      parts: (map['parts'] as List).map((e) => UniqueId.fromMap(e)).toList(),
+      parts: mapUniqueIdList(map['parts']),
       runningHours: map['runningHours'] != null
           ? RunningHours.fromMap(map['runningHours'])
           : null,

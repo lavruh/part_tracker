@@ -1,8 +1,11 @@
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
+import 'package:part_tracker/maintenance/domain/maintenance_notifier.dart';
+import 'package:part_tracker/part_types/domain/part_types_state.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
 import 'package:part_tracker/parts/domain/part_editor_state.dart';
+import 'package:part_tracker/parts/ui/widgets/part_update_widget.dart';
 import 'package:part_tracker/parts/ui/widgets/parts_search_dialog.dart';
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/data/i_db_service.dart';
@@ -16,6 +19,8 @@ class PartsManagerState extends GetxController {
   final table = 'parts';
   final _selectedPart = <Part>[].obs;
   final _editor = Get.find<PartEditorState>();
+  final _partTypeManager = Get.find<PartTypesState>();
+  final _maintenanceNotifier = Get.find<MaintenanceNotifier>();
   final _log = Get.find<LogbookState>();
   final foundPartsIds = <Part>[].obs;
 
@@ -50,6 +55,7 @@ class PartsManagerState extends GetxController {
   }
 
   void _updateState(Part part) {
+    _maintenanceNotifier.checkPartForNecessaryMaintenance(part: part);
     parts[part.partNo] = part;
   }
 
@@ -71,7 +77,15 @@ class PartsManagerState extends GetxController {
   Future<void> getParts() async {
     await for (final map in _db.getAll(table: table)) {
       final part = Part.fromMap(map);
-      _updateState(part);
+      try {
+        final updatedType = _partTypeManager.getTypeById(part.type.id);
+        _updateState(part.copyWith(type: updatedType));
+      } catch (e) {
+        Get.defaultDialog(
+            title: '',
+            middleText:
+                'Can not load part[${part.partNo.id}]. Part type with id[${part.type.id}] does not exist.');
+      }
     }
   }
 
@@ -118,6 +132,18 @@ class PartsManagerState extends GetxController {
     }
   }
 
+  void updateSelectedPart() async {
+    if (partSelected) {
+      final part = _selectedPart.first;
+      final updatedPart = await Get.defaultDialog(
+          title: 'Update part', content: PartUpdateWidget(part: part));
+      if (updatedPart != null) {
+        updatePart(updatedPart);
+        selectPart(updatedPart);
+      }
+    }
+  }
+
   updateRemarks(Part part) async {
     final remark =
         await textInputDialogWidget(title: 'Remarks', initName: part.remarks);
@@ -126,10 +152,16 @@ class PartsManagerState extends GetxController {
     }
   }
 
-  RunningHours clearPartCurrentRunningHours(UniqueId partId) {
+  RunningHours clearPartCurrentRunningHours(
+    UniqueId partId, {
+    RunningHours? installationRunningHours,
+  }) {
     final part = getPart(id: partId);
     final rhSpendOnLocation = part.runningHoursAtLocation;
-    updatePart(part.copyWith(runningHoursAtLocation: RunningHours(0)));
+    updatePart(part.copyWith(
+        runningHoursAtLocation: RunningHours(0),
+        installationRh: installationRunningHours ??
+            RunningHours.atTime(value: 0, date: DateTime.now())));
     return rhSpendOnLocation;
   }
 
@@ -153,5 +185,10 @@ class PartsManagerState extends GetxController {
     Get.find<LocationManagerState>()
         .selectLocationContainingPart(partId: p.partNo);
     selectPart(p);
+  }
+
+  reloadState() async {
+    parts.clear();
+    getParts();
   }
 }
