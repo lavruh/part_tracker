@@ -47,26 +47,24 @@ class AddMaintenancePlanButton extends StatelessWidget {
 
   Widget _showAddMenu(BuildContext context) {
     final types = DefaultMeterTypes.values;
-    return Flexible(
-      child: Container(
-        color: Colors.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Add",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            ...types.map((e) => TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Get.defaultDialog(
-                      title: "Edit ${e.value.title}",
-                      content: MaintenancePlanEditorWidget(plan: e.creator));
-                },
-                child: Text(e.value.title)))
-          ],
-        ),
+    return Container(
+      color: Colors.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "Add",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          ...types.map((e) => TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Get.defaultDialog(
+                    title: "Edit ${e.value.title}",
+                    content: MaintenancePlanEditorWidget(plan: e.creator));
+              },
+              child: Text(e.value.title)))
+        ],
       ),
     );
   }
