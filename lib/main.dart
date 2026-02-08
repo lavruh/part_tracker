@@ -11,7 +11,9 @@ import 'package:part_tracker/utils/ui/widgets/db_select_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:window_manager/window_manager.dart';
 
-void main() async {
+void main(List<String> args) async {
+   handleArgs(args);
+
   WidgetsFlutterBinding.ensureInitialized();
   if (await isPermissionsGranted() == false) return;
 
