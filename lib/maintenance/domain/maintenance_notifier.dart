@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/maintenance/domain/entities/counter_maintenance_plan.dart';
@@ -32,31 +33,41 @@ class MaintenanceNotifier extends GetxController {
     final partType = part.type;
     final partPlans = partType.maintenancePlans;
 
-    List<MaintenanceInfo> infoList = [];
-    for (final planId in partPlans) {
-      try {
-        final plan = getMaintenancePlan(planId);
-        final info = plan.checkPart(part: part);
-        if (info != null) infoList.add(info);
-      } catch (_) {
-        continue;
-      }
-    }
-    if (infoList.isEmpty) {
-      _removeDueToMaintenance(part: part);
-      return;
-    }
-
-    List<UniqueId> locationsTree = [];
     try {
       final location =
-          locationsState.getLocationContainingPart(partId: part.partNo);
-      final parentTree = locationsState.getParentLocationsTreeIds(location.id);
-      locationsTree = [location.id, ...parentTree];
-    } catch (_) {}
+      locationsState.getLocationContainingPart(partId: part.partNo);
+      final locationRunningHours = location.runningHours;
+      if (locationRunningHours == null) return;
 
-    _setDueToMaintenance(
-        part: part, infoList: infoList, locationsTree: locationsTree);
+      List<MaintenanceInfo> infoList = [];
+      for (final planId in partPlans) {
+        try {
+          final plan = getMaintenancePlan(planId);
+          final info = plan.checkPart(
+            part: part,
+            locationRunningHours: locationRunningHours,
+          );
+          if (info != null) infoList.add(info);
+        } catch (e) {
+          debugPrint(e.toString());
+          continue;
+        }
+      }
+      if (infoList.isEmpty) {
+        _removeDueToMaintenance(part: part);
+        return;
+      }
+
+      List<UniqueId> locationsTree = [];
+      try {
+        final parentTree = locationsState.getParentLocationsTreeIds(
+            location.id);
+        locationsTree = [location.id, ...parentTree];
+      } catch (_) {}
+
+      _setDueToMaintenance(
+          part: part, infoList: infoList, locationsTree: locationsTree);
+    } catch (_) {}
   }
 
   _setDueToMaintenance({

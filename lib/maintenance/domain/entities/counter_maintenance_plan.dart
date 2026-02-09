@@ -1,6 +1,7 @@
 import 'package:part_tracker/maintenance/domain/entities/maintenance_info.dart';
 import 'package:part_tracker/maintenance/domain/entities/maintenance_plan.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class CounterMaintenancePlan extends MaintenancePlan {
@@ -52,10 +53,24 @@ class CounterMaintenancePlan extends MaintenancePlan {
   }
 
   @override
-  MaintenanceInfo? checkPart({required Part part}) {
-    final rh = part.runningHoursAtLocation.value;
-    if (rh < counterLimit) return null;
-    final info = "Overdue ${rh - counterLimit}rhs";
+  MaintenanceInfo? checkPart({
+    required Part part,
+    required RunningHours locationRunningHours,
+  }) {
+    int currentRh = part.runningHoursAtLocation.value;
+
+    final lastMaintenance = part.doneMaintenance
+        .where((dm) => dm.planId == id)
+        .toList()
+      ..sort((a, b) => b.runningHours.value.compareTo(a.runningHours.value));
+
+    if (lastMaintenance.isNotEmpty) {
+      final lastMaintenanceRh = lastMaintenance.first.runningHours.value;
+      currentRh = locationRunningHours.value - lastMaintenanceRh;
+    }
+
+    if (currentRh < counterLimit) return null;
+    final info = "Overdue ${currentRh - counterLimit}rhs";
     return MaintenanceInfo(plan: this, info: info);
   }
 }

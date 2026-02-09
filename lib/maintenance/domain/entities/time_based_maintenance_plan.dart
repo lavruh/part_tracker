@@ -1,6 +1,7 @@
 import 'package:part_tracker/maintenance/domain/entities/maintenance_info.dart';
 import 'package:part_tracker/maintenance/domain/entities/maintenance_plan.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class TimeBasedMaintenancePlan extends MaintenancePlan {
@@ -17,7 +18,7 @@ class TimeBasedMaintenancePlan extends MaintenancePlan {
   const TimeBasedMaintenancePlan.empty()
       : timeLimit = 0,
         timeUnit = TimeUnit.day,
-        super.empty() ;
+        super.empty();
 
   @override
   TimeBasedMaintenancePlan copyWith({
@@ -63,15 +64,29 @@ class TimeBasedMaintenancePlan extends MaintenancePlan {
   }
 
   @override
-  MaintenanceInfo? checkPart({required Part part}) {
-    final installationDate = part.installationRh.date;
-    final counterLimitInDays = timeLimit * _getDuration(timeUnit).inDays;
+  MaintenanceInfo? checkPart({
+    required Part part,
+    required RunningHours locationRunningHours,
+  }) {
+    // Find the last done maintenance for this plan
+    final lastMaintenance = part.doneMaintenance
+        .where((dm) => dm.planId == id)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    final startDate = lastMaintenance.isNotEmpty
+        ? lastMaintenance.first.date
+        : part.installationRh.date;
+
+    final counterLimitInDays = getTimeLimitInDays();
     final now = DateTime.now();
-    final daysDifference = now.difference(installationDate).inDays;
+    final daysDifference = now.difference(startDate).inDays;
     if (daysDifference < counterLimitInDays) return null;
     final info = "Overdue $daysDifference days";
     return MaintenanceInfo(plan: this, info: info);
   }
+
+  int getTimeLimitInDays() => timeLimit * _getDuration(timeUnit).inDays;
 }
 
 Duration _getDuration(TimeUnit unit) {

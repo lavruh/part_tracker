@@ -53,16 +53,23 @@ class LogbookState extends GetxController {
     filteredEntries.value = [];
   }
 
-  movePartLogEntry(
-      {required Part part,
-      Location? source,
-      required Location target,
-      RunningHours? runningHoursSpentOnLocation}) async {
-    final remark = (await textInputDialogWidget(
-            title: 'Transaction remarks', initName: part.remarks)) ??
+  movePartLogEntry({
+    required Part part,
+    Location? source,
+    required Location target,
+    RunningHours? runningHoursSpentOnLocation,
+    String? extraRemarks,
+  }) async {
+    final remarks = (await textInputDialogWidget(
+            title: 'Transaction remarks',
+            initName: "${part.remarks} ${extraRemarks ?? ''}")) ??
         '';
 
-    String s = "${part.type.name} [No. ${part.partNo}] moved";
+    String s = "";
+    if (source != null) {
+      s += _getLocationLogInfo(source);
+    }
+    s += "${part.type.name} [No. ${part.partNo}] moved";
     if (source != null) {
       s += ' from ${source.id.id}';
     }
@@ -70,7 +77,8 @@ class LogbookState extends GetxController {
     if (runningHoursSpentOnLocation != null) {
       s += " after ${runningHoursSpentOnLocation.value} hours.";
     }
-    s += " $remark";
+    s += " $remarks";
+
     addLogEntry(
       s,
       relatedParts: [part.partNo],
@@ -82,10 +90,7 @@ class LogbookState extends GetxController {
     final location = Get.find<LocationsMenuState>().selectedLocation;
     if (location != null) {
       final part = Get.find<PartsManagerState>().selectedPart;
-      String logText = location.name;
-      if (location.runningHours != null) {
-        logText += '@${location.runningHours?.value}Hrs.';
-      }
+      String logText = _getLocationLogInfo(location);
       if (part != null) {
         logText += '${part.type.name}[${part.partNo}]';
       }
@@ -112,7 +117,8 @@ class LogbookState extends GetxController {
     _sortEntries();
     db.update(
         id: logEntry.id.toString(), item: logEntry.toMap(), table: _tableName);
-    _backupState.createBackup(description: logEntry.date.millisecondsSinceEpoch.toString());
+    _backupState.createBackup(
+        description: logEntry.date.millisecondsSinceEpoch.toString());
   }
 
   updateLogEntry(LogEntry entry) {
@@ -134,5 +140,25 @@ class LogbookState extends GetxController {
 
   _sortEntries() {
     entries.sort((a, b) => b.date.compareTo(a.date));
+  }
+
+  void addMaintenanceLogEntry({
+    required Location location,
+    required Part part,
+    required String remarks,
+  }) {
+    String s = _getLocationLogInfo(location);
+    s += "${part.type.name}[${part.partNo}]";
+    s += " $remarks";
+    addLogEntry(s,
+        relatedParts: [part.partNo], relatedLocations: [location.id]);
+  }
+
+  String _getLocationLogInfo(Location location) {
+    String s = location.name;
+    if (location.runningHours != null) {
+      s += '@${location.runningHours?.value}Hrs.';
+    }
+    return s;
   }
 }
