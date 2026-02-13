@@ -68,7 +68,21 @@ class TimeBasedMaintenancePlan extends MaintenancePlan {
     required Part part,
     required RunningHours locationRunningHours,
   }) {
-    // Find the last done maintenance for this plan
+    final counterLimitInDays = getTimeLimitInDays();
+    final daysDifference = _getDifference(part, locationRunningHours);
+    if (daysDifference < counterLimitInDays) return null;
+    final info = "Overdue $daysDifference days";
+    return MaintenanceInfo(
+        plan: this,
+        info: info,
+        isOverdue: true,
+        difference: daysDifference,
+        percentage: _getPercentage(daysDifference));
+  }
+
+  int getTimeLimitInDays() => timeLimit * _getDuration(timeUnit).inDays;
+
+  int _getDifference(Part part, RunningHours locationRunningHours) {
     final lastMaintenance = part.doneMaintenance
         .where((dm) => dm.planId == id)
         .toList()
@@ -78,15 +92,32 @@ class TimeBasedMaintenancePlan extends MaintenancePlan {
         ? lastMaintenance.first.date
         : part.installationRh.date;
 
-    final counterLimitInDays = getTimeLimitInDays();
     final now = DateTime.now();
     final daysDifference = now.difference(startDate).inDays;
-    if (daysDifference < counterLimitInDays) return null;
-    final info = "Overdue $daysDifference days";
-    return MaintenanceInfo(plan: this, info: info);
+    return daysDifference;
   }
 
-  int getTimeLimitInDays() => timeLimit * _getDuration(timeUnit).inDays;
+  @override
+  MaintenanceInfo? timeToMaintenance({
+    required Part part,
+    required RunningHours locationRunningHours,
+  }) {
+    final counterLimitInDays = getTimeLimitInDays();
+    final daysDifference = _getDifference(part, locationRunningHours);
+    final isOverdue = daysDifference >= counterLimitInDays;
+
+    String info = "$daysDifference days overdue";
+    if (!isOverdue) info = "$daysDifference days until";
+    return MaintenanceInfo(
+        plan: this,
+        info: info,
+        isOverdue: isOverdue,
+        difference: daysDifference,
+        percentage: _getPercentage(daysDifference));
+  }
+
+  double _getPercentage(int difference) =>
+      (difference / getTimeLimitInDays()).abs();
 }
 
 Duration _getDuration(TimeUnit unit) {

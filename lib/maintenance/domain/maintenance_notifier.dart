@@ -30,29 +30,22 @@ class MaintenanceNotifier extends GetxController {
   }
 
   void checkPartForNecessaryMaintenance({required Part part}) {
-    final partType = part.type;
-    final partPlans = partType.maintenancePlans;
-
     try {
       final location =
-      locationsState.getLocationContainingPart(partId: part.partNo);
+          locationsState.getLocationContainingPart(partId: part.partNo);
       final locationRunningHours = location.runningHours;
       if (locationRunningHours == null) return;
+      final infoList = _performCheck<MaintenanceInfo>(
+          part: part,
+          check: ({
+            required MaintenancePlan plan,
+            required Part part,
+          }) =>
+              plan.checkPart(
+                part: part,
+                locationRunningHours: locationRunningHours,
+              ));
 
-      List<MaintenanceInfo> infoList = [];
-      for (final planId in partPlans) {
-        try {
-          final plan = getMaintenancePlan(planId);
-          final info = plan.checkPart(
-            part: part,
-            locationRunningHours: locationRunningHours,
-          );
-          if (info != null) infoList.add(info);
-        } catch (e) {
-          debugPrint(e.toString());
-          continue;
-        }
-      }
       if (infoList.isEmpty) {
         _removeDueToMaintenance(part: part);
         return;
@@ -60,14 +53,35 @@ class MaintenanceNotifier extends GetxController {
 
       List<UniqueId> locationsTree = [];
       try {
-        final parentTree = locationsState.getParentLocationsTreeIds(
-            location.id);
+        final parentTree =
+            locationsState.getParentLocationsTreeIds(location.id);
         locationsTree = [location.id, ...parentTree];
       } catch (_) {}
 
       _setDueToMaintenance(
           part: part, infoList: infoList, locationsTree: locationsTree);
     } catch (_) {}
+  }
+
+  List<MaintenanceInfo> checkPartTimeToMaintenance({required Part part}) {
+    try {
+      final location =
+          locationsState.getLocationContainingPart(partId: part.partNo);
+      final locationRunningHours = location.runningHours;
+      if (locationRunningHours == null) return [];
+      return _performCheck<MaintenanceInfo>(
+          part: part,
+          check: ({
+            required MaintenancePlan plan,
+            required Part part,
+          }) =>
+              plan.timeToMaintenance(
+                part: part,
+                locationRunningHours: locationRunningHours,
+              ));
+    } catch (_) {
+      return [];
+    }
   }
 
   _setDueToMaintenance({
@@ -134,7 +148,7 @@ class MaintenanceNotifier extends GetxController {
     }
   }
 
-  List<MaintenanceInfo> necessaryMaintenanceInfos(UniqueId partId){
+  List<MaintenanceInfo> necessaryMaintenanceInfos(UniqueId partId) {
     return partsDueToMaintenance[partId] ?? [];
   }
 
@@ -145,5 +159,36 @@ class MaintenanceNotifier extends GetxController {
 
   isDueToMaintenance(UniqueId id) {
     return locationsDueToMaintenance.containsKey(id);
+  }
+
+  List<T> _performCheck<T>({
+    required Part part,
+    required T? Function({
+      required MaintenancePlan plan,
+      required Part part,
+    }) check,
+  }) {
+    final partType = part.type;
+    final partPlans = partType.maintenancePlans;
+
+    try {
+      List<T> infoList = [];
+      for (final planId in partPlans) {
+        try {
+          final plan = getMaintenancePlan(planId);
+          final info = check(
+            plan: plan,
+            part: part,
+          );
+          if (info != null) infoList.add(info);
+        } catch (e) {
+          debugPrint(e.toString());
+          continue;
+        }
+      }
+      return infoList;
+    } catch (_) {
+      return [];
+    }
   }
 }
