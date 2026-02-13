@@ -25,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
 
 bool _setLock = true;
+String? _dbPathArg;
 
 Future<bool> initDependencies() async {
   try {
@@ -33,7 +34,7 @@ Future<bool> initDependencies() async {
     final lockManager = Get.put(DBLockManager());
 
     Get.put<IFileProvider>(FileProvider.getInstance());
-    final path = pref.getString('dbPath');
+    final path = _dbPathArg ?? pref.getString('dbPath');
     if (path == null) {
       throw Exception('No db selected');
     }
@@ -92,6 +93,12 @@ void handleArgs(List<String> args){
    for (var arg in args) {
     if (arg.startsWith('--no-lock')) {
       _setLock = false;
+    }
+    if (arg.startsWith('--db-path=') || arg.startsWith('-db-path=')) {
+      final equalSignIndex = arg.indexOf('=');
+      if (equalSignIndex != -1 && equalSignIndex < arg.length - 1) {
+        _dbPathArg = arg.substring(equalSignIndex + 1);
+      }
     }
    }
   }
