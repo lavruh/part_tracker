@@ -1,7 +1,9 @@
 import 'package:part_tracker/maintenance/domain/entities/counter_maintenance_plan.dart';
+import 'package:part_tracker/maintenance/domain/entities/done_maintenance.dart';
 import 'package:part_tracker/maintenance/domain/entities/maintenance_info.dart';
 import 'package:part_tracker/maintenance/domain/entities/time_based_maintenance_plan.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class MaintenancePlan {
@@ -20,7 +22,22 @@ class MaintenancePlan {
         title = "",
         description = "";
 
-  MaintenanceInfo? checkPart({required Part part}) => null;
+  MaintenanceInfo? checkPart({
+    required Part part,
+    required RunningHours locationRunningHours,
+  }) =>
+      null;
+
+  MaintenanceInfo? timeToMaintenance({
+    required Part part,
+    required RunningHours locationRunningHours,
+  }) =>
+      null;
+
+
+  List<DoneMaintenance> getDoneMaintenance(Part part) => part.doneMaintenance
+      .where((dm) => dm.planId == id)
+      .toList();
 
   MaintenancePlan copyWith({
     UniqueId? id,

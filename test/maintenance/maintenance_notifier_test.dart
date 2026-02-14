@@ -7,6 +7,7 @@ import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/locations/domain/locations_menu_state.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
 import 'package:part_tracker/maintenance/domain/entities/counter_maintenance_plan.dart';
+import 'package:part_tracker/maintenance/domain/entities/done_maintenance.dart';
 import 'package:part_tracker/maintenance/domain/entities/time_based_maintenance_plan.dart';
 import 'package:part_tracker/maintenance/domain/maintenance_notifier.dart';
 import 'package:part_tracker/part_types/domain/entities/part_type.dart';
@@ -214,6 +215,7 @@ main() {
         remarks: 'Test part',
         type: partType,
         installationRh: RunningHours(0),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
@@ -237,6 +239,7 @@ main() {
         remarks: 'Test part',
         type: partType,
         installationRh: RunningHours(0),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
@@ -254,6 +257,7 @@ main() {
         remarks: 'Test part',
         type: partType,
         installationRh: RunningHours(0),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
@@ -286,6 +290,7 @@ main() {
         remarks: 'Test part',
         type: updatedPartType,
         installationRh: RunningHours(0),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
@@ -317,6 +322,7 @@ main() {
         remarks: 'Test part',
         type: partType,
         installationRh: RunningHours(0),
+        doneMaintenance: [],
       );
       final location = Location(
           id: locationId,
@@ -359,6 +365,7 @@ main() {
         remarks: 'Test part',
         type: partTypeNoPlans,
         installationRh: RunningHours(0),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
@@ -381,6 +388,239 @@ main() {
         remarks: 'Test part',
         type: partTypeWithMissingPlan,
         installationRh: RunningHours(0),
+        doneMaintenance: [],
+      );
+
+      notifier.checkPartForNecessaryMaintenance(part: part);
+
+      expect(notifier.partsDueToMaintenance.containsKey(part.partNo), false);
+    });
+
+    test(
+        'should not mark part as due when done maintenance exists within counter limit',
+        () {
+      final limit = counterPlan.counterLimit;
+      final doneMaintenance = DoneMaintenance(
+        date: DateTime.now().subtract(Duration(days: 30)),
+        runningHours: RunningHours(limit),
+        planId: counterPlan.id,
+        remarks: 'Regular maintenance',
+      );
+
+      final part = Part(
+        partNo: UniqueId(),
+        runningHours: RunningHours(limit + 1),
+        runningHoursAtLocation: RunningHours(limit + 1),
+        remarks: 'Test part',
+        type: partType,
+        installationRh: RunningHours(0),
+        doneMaintenance: [doneMaintenance],
+      );
+
+      notifier.checkPartForNecessaryMaintenance(part: part);
+
+      expect(notifier.partsDueToMaintenance.containsKey(part.partNo), false);
+    });
+
+    test(
+        'should mark part as due when running hours exceed  counter limit after done maintenance',
+        () {
+      final limit = counterPlan.counterLimit;
+      final locationId = UniqueId();
+      final doneMaintenance = DoneMaintenance(
+        date: DateTime.now().subtract(Duration(days: 30)),
+        runningHours: RunningHours(limit),
+        planId: counterPlan.id,
+        remarks: 'Regular maintenance',
+      );
+
+      final part = Part(
+        partNo: UniqueId(),
+        runningHours: RunningHours(limit * 2 + 1),
+        runningHoursAtLocation: RunningHours(limit * 2 + 1),
+        remarks: 'Test part',
+        type: partType,
+        installationRh: RunningHours(0),
+        doneMaintenance: [doneMaintenance],
+      );
+
+      final location = Location(
+        id: locationId,
+        name: 'Test Location',
+        allowedPartTypes: {},
+        runningHours: RunningHours(limit * 2 + 1),
+        parts: [part.partNo],
+      );
+
+      Get.reset();
+      mockDbService = MockIDbService();
+      when(mockDbService.getAll(table: tableName))
+          .thenAnswer((_) => Stream.empty());
+
+      Get.put<IDbService>(mockDbService);
+      Get.put<LogbookState>(MockLogbookState());
+      Get.put<LocationsMenuState>(MockLocationsMenuState());
+      final locationsState = LocationManagerState();
+      Get.replace<LocationManagerState>(locationsState);
+      locationsState.locations[locationId] = location;
+      notifier = MaintenanceNotifier();
+      notifier.maintenancePlans[counterPlan.id] = counterPlan;
+
+      notifier.checkPartForNecessaryMaintenance(part: part);
+
+      expect(notifier.partsDueToMaintenance.containsKey(part.partNo), true);
+      expect(notifier.partsDueToMaintenance[part.partNo]!.length, 1);
+
+      final maintenanceInfo =
+          notifier.partsDueToMaintenance[part.partNo]!.first;
+      expect(maintenanceInfo.plan, equals(counterPlan));
+      expect(maintenanceInfo.info, contains('Overdue'));
+    });
+
+    test(
+        'should mark part as due when running hours exceed  counter limit after done maintenance',
+            () {
+          final limit = counterPlan.counterLimit;
+          final counterOffset = 12000;
+          final doneMaintenance = DoneMaintenance(
+            date: DateTime.now().subtract(Duration(days: 30)),
+            runningHours: RunningHours(limit),
+            planId: counterPlan.id,
+            remarks: 'Regular maintenance',
+          );
+
+          final part = Part(
+            partNo: UniqueId(),
+            runningHours: RunningHours(counterOffset + limit * 2 + 1),
+            runningHoursAtLocation: RunningHours(limit * 2 + 1),
+            remarks: 'Test part',
+            type: partType,
+            installationRh: RunningHours(counterOffset),
+            doneMaintenance: [doneMaintenance],
+          );
+
+          final locationId = UniqueId();
+          final location = Location(
+            id: locationId,
+            name: 'Test Location',
+            allowedPartTypes: {},
+            runningHours: RunningHours(counterOffset + limit * 2 + 1),
+            parts: [part.partNo],
+          );
+
+          Get.reset();
+          mockDbService = MockIDbService();
+          when(mockDbService.getAll(table: tableName))
+              .thenAnswer((_) => Stream.empty());
+
+          Get.put<IDbService>(mockDbService);
+          Get.put<LogbookState>(MockLogbookState());
+          Get.put<LocationsMenuState>(MockLocationsMenuState());
+          final locationsState = LocationManagerState();
+          Get.replace<LocationManagerState>(locationsState);
+          locationsState.locations[locationId] = location;
+          notifier = MaintenanceNotifier();
+          notifier.maintenancePlans[counterPlan.id] = counterPlan;
+
+          notifier.checkPartForNecessaryMaintenance(part: part);
+
+          expect(notifier.partsDueToMaintenance.containsKey(part.partNo), true);
+          expect(notifier.partsDueToMaintenance[part.partNo]!.length, 1);
+
+          final maintenanceInfo =
+              notifier.partsDueToMaintenance[part.partNo]!.first;
+          expect(maintenanceInfo.plan, equals(counterPlan));
+          expect(maintenanceInfo.info, contains('Overdue'));
+        });
+
+    test(
+        'should not mark part as due when done maintenance few times within counter limit',
+        () {
+      final limit = counterPlan.counterLimit * 3;
+      final doneMaintenance = DoneMaintenance(
+        date: DateTime.now().subtract(Duration(days: 30)),
+        runningHours: RunningHours(limit),
+        planId: counterPlan.id,
+        remarks: 'Regular maintenance',
+      );
+
+      final part = Part(
+        partNo: UniqueId(),
+        runningHours: RunningHours(limit + 1),
+        runningHoursAtLocation: RunningHours(limit + 1),
+        remarks: 'Test part',
+        type: partType,
+        installationRh: RunningHours(0),
+        doneMaintenance: [doneMaintenance],
+      );
+
+      notifier.checkPartForNecessaryMaintenance(part: part);
+
+      expect(notifier.partsDueToMaintenance.containsKey(part.partNo), false);
+    });
+
+    test('should not mark part as due when done maintenance few of same plan',
+        () {
+      final limit = counterPlan.counterLimit * 2;
+      final doneMaintenance = DoneMaintenance(
+        date: DateTime.now().subtract(Duration(days: 30)),
+        runningHours: RunningHours(limit),
+        planId: counterPlan.id,
+        remarks: 'Regular maintenance',
+      );
+      final doneMaintenance2 = DoneMaintenance(
+        date: DateTime.now().subtract(Duration(days: 60)),
+        runningHours: RunningHours(counterPlan.counterLimit),
+        planId: counterPlan.id,
+        remarks: 'Regular maintenance',
+      );
+
+      final part = Part(
+        partNo: UniqueId(),
+        runningHours: RunningHours(limit + 1),
+        runningHoursAtLocation: RunningHours(limit + 1),
+        remarks: 'Test part',
+        type: partType,
+        installationRh: RunningHours(0),
+        doneMaintenance: [doneMaintenance, doneMaintenance2],
+      );
+
+      notifier.checkPartForNecessaryMaintenance(part: part);
+
+      expect(notifier.partsDueToMaintenance.containsKey(part.partNo), false);
+    });
+
+    test(
+        'should not mark part as due when done maintenance few of different plans',
+        () {
+      final limit = counterPlan.counterLimit * 2;
+      final doneMaintenance = DoneMaintenance(
+        date: DateTime.now().subtract(Duration(days: 30)),
+        runningHours: RunningHours(limit),
+        planId: counterPlan.id,
+        remarks: 'Regular maintenance',
+      );
+      final doneMaintenance2 = DoneMaintenance(
+        date: DateTime.now().subtract(Duration(days: 60)),
+        runningHours: RunningHours(counterPlan.counterLimit),
+        planId: counterPlan.id,
+        remarks: 'Regular maintenance',
+      );
+      final differentPlan = DoneMaintenance(
+        date: DateTime.now().subtract(Duration(days: 15)),
+        runningHours: RunningHours(counterPlan.counterLimit - 1),
+        planId: UniqueId(),
+        remarks: 'Regular maintenance',
+      );
+
+      final part = Part(
+        partNo: UniqueId(),
+        runningHours: RunningHours(limit + 1),
+        runningHoursAtLocation: RunningHours(limit + 1),
+        remarks: 'Test part',
+        type: partType,
+        installationRh: RunningHours(0),
+        doneMaintenance: [doneMaintenance, doneMaintenance2, differentPlan],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
@@ -389,7 +629,8 @@ main() {
     });
   });
 
-  group('MaintenanceNotifier checkPartForNecessaryMaintenance - Time Based', () {
+  group('MaintenanceNotifier checkPartForNecessaryMaintenance - Time Based',
+      () {
     late MockIDbService mockDbService;
     late MaintenanceNotifier notifier;
     late PartType partType;
@@ -404,9 +645,9 @@ main() {
       Get.put<LogbookState>(MockLogbookState());
       Get.put<LocationsMenuState>(MockLocationsMenuState());
       Get.put<LocationManagerState>(MockLocationManagerState());
-      
+
       notifier = MaintenanceNotifier();
-      
+
       timePlan = TimeBasedMaintenancePlan(
         id: UniqueId(id: "timePlan1"),
         title: 'Monthly Inspection',
@@ -414,17 +655,18 @@ main() {
         timeLimit: 30,
         timeUnit: TimeUnit.day,
       );
-      
+
       partType = PartType(
         id: UniqueId(id: "partType1"),
         name: 'Time Maintained Part',
         maintenancePlans: [timePlan.id],
       );
-      
+
       notifier.maintenancePlans[timePlan.id] = timePlan;
     });
 
-    test('should detect part due for time-based maintenance (days overdue)', () {
+    test('should detect part due for time-based maintenance (days overdue)',
+        () {
       final installationDate = DateTime.now().subtract(Duration(days: 45));
       final part = Part(
         partNo: UniqueId(id: "part1"),
@@ -433,20 +675,24 @@ main() {
         remarks: 'Test part',
         type: partType,
         installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
 
       expect(notifier.partsDueToMaintenance.containsKey(part.partNo), true);
       expect(notifier.partsDueToMaintenance[part.partNo]!.length, 1);
-      
-      final maintenanceInfo = notifier.partsDueToMaintenance[part.partNo]!.first;
+
+      final maintenanceInfo =
+          notifier.partsDueToMaintenance[part.partNo]!.first;
       expect(maintenanceInfo.plan.id, timePlan.id);
       expect(maintenanceInfo.info, contains('Overdue'));
       expect(maintenanceInfo.info, contains('days'));
     });
 
-    test('should not detect part due for time-based maintenance when within limit', () {
+    test(
+        'should not detect part due for time-based maintenance when within limit',
+        () {
       final installationDate = DateTime.now().subtract(Duration(days: 15));
       final part = Part(
         partNo: UniqueId(id: "part2"),
@@ -455,6 +701,7 @@ main() {
         remarks: 'Test part',
         type: partType,
         installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
@@ -470,15 +717,15 @@ main() {
         timeLimit: 2,
         timeUnit: TimeUnit.week,
       );
-      
+
       final weeklyPartType = PartType(
         id: UniqueId(id: "weeklyPartType"),
         name: 'Weekly Maintained Part',
         maintenancePlans: [weeklyPlan.id],
       );
-      
+
       notifier.maintenancePlans[weeklyPlan.id] = weeklyPlan;
-      
+
       final installationDate = DateTime.now().subtract(Duration(days: 21));
       final part = Part(
         partNo: UniqueId(id: "part3"),
@@ -487,14 +734,16 @@ main() {
         remarks: 'Test part',
         type: weeklyPartType,
         installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
 
       expect(notifier.partsDueToMaintenance.containsKey(part.partNo), true);
       expect(notifier.partsDueToMaintenance[part.partNo]!.length, 1);
-      
-      final maintenanceInfo = notifier.partsDueToMaintenance[part.partNo]!.first;
+
+      final maintenanceInfo =
+          notifier.partsDueToMaintenance[part.partNo]!.first;
       expect(maintenanceInfo.plan.id, weeklyPlan.id);
       expect(maintenanceInfo.info, contains('Overdue'));
     });
@@ -507,15 +756,15 @@ main() {
         timeLimit: 3,
         timeUnit: TimeUnit.month,
       );
-      
+
       final monthlyPartType = PartType(
         id: UniqueId(id: "monthlyPartType"),
         name: 'Monthly Maintained Part',
         maintenancePlans: [monthlyPlan.id],
       );
-      
+
       notifier.maintenancePlans[monthlyPlan.id] = monthlyPlan;
-      
+
       final installationDate = DateTime.now().subtract(Duration(days: 120));
       final part = Part(
         partNo: UniqueId(id: "part4"),
@@ -524,19 +773,22 @@ main() {
         remarks: 'Test part',
         type: monthlyPartType,
         installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
 
       expect(notifier.partsDueToMaintenance.containsKey(part.partNo), true);
       expect(notifier.partsDueToMaintenance[part.partNo]!.length, 1);
-      
-      final maintenanceInfo = notifier.partsDueToMaintenance[part.partNo]!.first;
+
+      final maintenanceInfo =
+          notifier.partsDueToMaintenance[part.partNo]!.first;
       expect(maintenanceInfo.plan.id, monthlyPlan.id);
       expect(maintenanceInfo.info, contains('Overdue'));
     });
 
-    test('should handle multiple time-based maintenance plans for same part', () {
+    test('should handle multiple time-based maintenance plans for same part',
+        () {
       final timePlan2 = TimeBasedMaintenancePlan(
         id: UniqueId(id: "timePlan2"),
         title: 'Quarterly Check',
@@ -544,15 +796,15 @@ main() {
         timeLimit: 90,
         timeUnit: TimeUnit.day,
       );
-      
+
       final multiTimePartType = PartType(
         id: UniqueId(id: "multiTimePartType"),
         name: 'Multi Time Maintained Part',
         maintenancePlans: [timePlan.id, timePlan2.id],
       );
-      
+
       notifier.maintenancePlans[timePlan2.id] = timePlan2;
-      
+
       final installationDate = DateTime.now().subtract(Duration(days: 100));
       final part = Part(
         partNo: UniqueId(id: "part5"),
@@ -561,19 +813,23 @@ main() {
         remarks: 'Test part',
         type: multiTimePartType,
         installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
 
       expect(notifier.partsDueToMaintenance.containsKey(part.partNo), true);
       expect(notifier.partsDueToMaintenance[part.partNo]!.length, 2);
-      
+
       final maintenanceInfos = notifier.partsDueToMaintenance[part.partNo]!;
       expect(maintenanceInfos.any((info) => info.plan.id == timePlan.id), true);
-      expect(maintenanceInfos.any((info) => info.plan.id == timePlan2.id), true);
+      expect(
+          maintenanceInfos.any((info) => info.plan.id == timePlan2.id), true);
     });
 
-    test('should add time-based maintenance part to locations due for maintenance', () {
+    test(
+        'should add time-based maintenance part to locations due for maintenance',
+        () {
       final locationId = UniqueId(id: "location1");
       final installationDate = DateTime.now().subtract(Duration(days: 45));
       final part = Part(
@@ -583,6 +839,7 @@ main() {
         remarks: 'Test part',
         type: partType,
         installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [],
       );
       final location = Location(
         id: locationId,
@@ -612,7 +869,9 @@ main() {
           contains(part.partNo));
     });
 
-    test('should handle time-based maintenance with missing location gracefully', () {
+    test(
+        'should handle time-based maintenance with missing location gracefully',
+        () {
       final installationDate = DateTime.now().subtract(Duration(days: 45));
       final part = Part(
         partNo: UniqueId(id: "part7"),
@@ -621,6 +880,7 @@ main() {
         remarks: 'Test part',
         type: partType,
         installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [],
       );
 
       notifier.checkPartForNecessaryMaintenance(part: part);
@@ -629,7 +889,116 @@ main() {
       expect(notifier.locationsDueToMaintenance.isEmpty, true);
     });
 
+    test(
+        'should not mark part as due when done maintenance exists within time limit',
+        () {
+      final limitInDays = timePlan.getTimeLimitInDays();
+      final maintenanceDate =
+          DateTime.now().subtract(Duration(days: limitInDays - 1));
+      final doneMaintenance = DoneMaintenance(
+        date: maintenanceDate,
+        runningHours: RunningHours(100),
+        planId: timePlan.id,
+        remarks: 'Regular maintenance',
+      );
+
+      final installationDate =
+          DateTime.now().subtract(Duration(days: limitInDays * 2));
+      final part = Part(
+        partNo: UniqueId(id: "part8"),
+        runningHours: RunningHours(200),
+        runningHoursAtLocation: RunningHours(200),
+        remarks: 'Test part',
+        type: partType,
+        installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [doneMaintenance],
+      );
+
+      notifier.checkPartForNecessaryMaintenance(part: part);
+
+      expect(notifier.partsDueToMaintenance.containsKey(part.partNo), false);
+    });
+
+    test(
+        'should mark part as due when time exceeds limit after done maintenance',
+        () {
+          final limitInDays = timePlan.getTimeLimitInDays();
+      final maintenanceDate = DateTime.now().subtract(Duration(days: limitInDays + 1));
+      final doneMaintenance = DoneMaintenance(
+        date: maintenanceDate,
+        runningHours: RunningHours(100),
+        planId: timePlan.id,
+        remarks: 'Regular maintenance',
+      );
+
+      final installationDate = DateTime.now().subtract(Duration(days: limitInDays * 2));
+      final part = Part(
+        partNo: UniqueId(id: "part9"),
+        runningHours: RunningHours(200),
+        runningHoursAtLocation: RunningHours(200),
+        remarks: 'Test part',
+        type: partType,
+        installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [doneMaintenance],
+      );
+
+      notifier.checkPartForNecessaryMaintenance(part: part);
+
+      expect(notifier.partsDueToMaintenance.containsKey(part.partNo), true);
+      expect(notifier.partsDueToMaintenance[part.partNo]!.length, 1);
+
+      final maintenanceInfo =
+          notifier.partsDueToMaintenance[part.partNo]!.first;
+      expect(maintenanceInfo.plan.id, timePlan.id);
+      expect(maintenanceInfo.info, contains('Overdue'));
+    });
+
+    test('should handle weekly time-based maintenance with done maintenance',
+        () {
+      final weeklyPlan = TimeBasedMaintenancePlan(
+        id: UniqueId(id: "weeklyPlan2"),
+        title: 'Weekly Check',
+        description: 'Check part weekly',
+        timeLimit: 2,
+        timeUnit: TimeUnit.week,
+      );
+
+      final weeklyPartType = PartType(
+        id: UniqueId(id: "weeklyPartType2"),
+        name: 'Weekly Maintained Part',
+        maintenancePlans: [weeklyPlan.id],
+      );
+
+      notifier.maintenancePlans[weeklyPlan.id] = weeklyPlan;
+
+      final maintenanceDate = DateTime.now().subtract(Duration(days: 15));
+      final doneMaintenance = DoneMaintenance(
+        date: maintenanceDate,
+        runningHours: RunningHours(100),
+        planId: weeklyPlan.id,
+        remarks: 'Weekly maintenance',
+      );
+
+      final installationDate = DateTime.now().subtract(Duration(days: 25));
+      final part = Part(
+        partNo: UniqueId(id: "part10"),
+        runningHours: RunningHours(200),
+        runningHoursAtLocation: RunningHours(200),
+        remarks: 'Test part',
+        type: weeklyPartType,
+        installationRh: RunningHours.atTime(value: 0, date: installationDate),
+        doneMaintenance: [doneMaintenance],
+      );
+
+      notifier.checkPartForNecessaryMaintenance(part: part);
+
+      expect(notifier.partsDueToMaintenance.containsKey(part.partNo), true);
+      expect(notifier.partsDueToMaintenance[part.partNo]!.length, 1);
+
+      final maintenanceInfo =
+          notifier.partsDueToMaintenance[part.partNo]!.first;
+      expect(maintenanceInfo.plan.id, weeklyPlan.id);
+      expect(maintenanceInfo.info, contains('Overdue'));
+    });
   });
-
-
 }

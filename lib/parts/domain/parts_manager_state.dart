@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:part_tracker/locations/domain/locations_manager_state.dart';
 import 'package:part_tracker/logbook/domain/logbook_state.dart';
+import 'package:part_tracker/maintenance/domain/entities/done_maintenance.dart';
+import 'package:part_tracker/maintenance/domain/entities/maintenance_info.dart';
 import 'package:part_tracker/maintenance/domain/maintenance_notifier.dart';
 import 'package:part_tracker/part_types/domain/part_types_state.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
@@ -81,10 +84,9 @@ class PartsManagerState extends GetxController {
         final updatedType = _partTypeManager.getTypeById(part.type.id);
         _updateState(part.copyWith(type: updatedType));
       } catch (e) {
-        Get.defaultDialog(
-            title: '',
-            middleText:
-                'Can not load part[${part.partNo.id}]. Part type with id[${part.type.id}] does not exist.');
+          debugPrint("GetParts : $e");
+          continue;
+
       }
     }
   }
@@ -190,5 +192,27 @@ class PartsManagerState extends GetxController {
   reloadState() async {
     parts.clear();
     getParts();
+  }
+
+  String? performMaintenance({
+    required UniqueId partId,
+    required RunningHours runningHours,
+    List<MaintenanceInfo>? maintenanceToPerform,
+  }) {
+    String logWhatDone = '';
+    final part = getPart(id: partId);
+    final maintenanceInfos = maintenanceToPerform ??
+        _maintenanceNotifier.necessaryMaintenanceInfos(partId);
+    if (maintenanceInfos.isEmpty) return null;
+    List<DoneMaintenance> doneMaintenances = part.doneMaintenance;
+    for (final maintenanceInfo in maintenanceInfos) {
+      final planId = maintenanceInfo.plan.id;
+      final doneMaintenance =
+          DoneMaintenance.now(runningHours: runningHours, planId: planId);
+      logWhatDone+=" ${maintenanceInfo.plan.title} ";
+      doneMaintenances.add(doneMaintenance);
+    }
+    updatePart(part.copyWith(doneMaintenance: doneMaintenances));
+    return logWhatDone;
   }
 }

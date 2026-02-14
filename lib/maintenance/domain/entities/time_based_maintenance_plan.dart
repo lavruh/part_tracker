@@ -1,6 +1,7 @@
 import 'package:part_tracker/maintenance/domain/entities/maintenance_info.dart';
 import 'package:part_tracker/maintenance/domain/entities/maintenance_plan.dart';
 import 'package:part_tracker/parts/domain/entities/part.dart';
+import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class TimeBasedMaintenancePlan extends MaintenancePlan {
@@ -17,7 +18,7 @@ class TimeBasedMaintenancePlan extends MaintenancePlan {
   const TimeBasedMaintenancePlan.empty()
       : timeLimit = 0,
         timeUnit = TimeUnit.day,
-        super.empty() ;
+        super.empty();
 
   @override
   TimeBasedMaintenancePlan copyWith({
@@ -63,15 +64,60 @@ class TimeBasedMaintenancePlan extends MaintenancePlan {
   }
 
   @override
-  MaintenanceInfo? checkPart({required Part part}) {
-    final installationDate = part.installationRh.date;
-    final counterLimitInDays = timeLimit * _getDuration(timeUnit).inDays;
-    final now = DateTime.now();
-    final daysDifference = now.difference(installationDate).inDays;
+  MaintenanceInfo? checkPart({
+    required Part part,
+    required RunningHours locationRunningHours,
+  }) {
+    final counterLimitInDays = getTimeLimitInDays();
+    final daysDifference = _getDifference(part, locationRunningHours);
     if (daysDifference < counterLimitInDays) return null;
     final info = "Overdue $daysDifference days";
-    return MaintenanceInfo(plan: this, info: info);
+    return MaintenanceInfo(
+        plan: this,
+        info: info,
+        isOverdue: true,
+        difference: daysDifference,
+        percentage: _getPercentage(daysDifference));
   }
+
+  int getTimeLimitInDays() => timeLimit * _getDuration(timeUnit).inDays;
+
+  int _getDifference(Part part, RunningHours locationRunningHours) {
+    final lastMaintenance = part.doneMaintenance
+        .where((dm) => dm.planId == id)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    final startDate = lastMaintenance.isNotEmpty
+        ? lastMaintenance.first.date
+        : part.installationRh.date;
+
+    final now = DateTime.now();
+    final daysDifference = now.difference(startDate).inDays;
+    return daysDifference;
+  }
+
+  @override
+  MaintenanceInfo? timeToMaintenance({
+    required Part part,
+    required RunningHours locationRunningHours,
+  }) {
+    final counterLimitInDays = getTimeLimitInDays();
+    final daysDifference = _getDifference(part, locationRunningHours);
+    final isOverdue = daysDifference >= counterLimitInDays;
+
+    String info = "$daysDifference days overdue";
+    if (!isOverdue) info = "$daysDifference days until";
+    return MaintenanceInfo(
+        plan: this,
+        info: info,
+        isOverdue: isOverdue,
+        difference: daysDifference,
+        percentage: _getPercentage(daysDifference));
+  }
+
+  double _getPercentage(int difference) =>
+      (difference / getTimeLimitInDays()).abs();
 }
 
 Duration _getDuration(TimeUnit unit) {

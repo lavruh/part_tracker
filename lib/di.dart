@@ -24,6 +24,9 @@ import 'package:part_tracker/utils/domain/settings_repo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
 
+bool _setLock = true;
+String? _dbPathArg;
+
 Future<bool> initDependencies() async {
   try {
     final pref = await SharedPreferences.getInstance();
@@ -31,7 +34,7 @@ Future<bool> initDependencies() async {
     final lockManager = Get.put(DBLockManager());
 
     Get.put<IFileProvider>(FileProvider.getInstance());
-    final path = pref.getString('dbPath');
+    final path = _dbPathArg ?? pref.getString('dbPath');
     if (path == null) {
       throw Exception('No db selected');
     }
@@ -76,10 +79,27 @@ Future<bool> initDependencies() async {
     Get.put<String>(packageInfo.version, tag: 'version');
     Get.put<String>(path, tag: 'dbPath');
 
-    await lockManager.setLock(path);
+    if(_setLock)  await lockManager.setLock(path);
 
     return true;
   } catch (e) {
     rethrow;
+  }
+}
+
+
+void handleArgs(List<String> args){
+  if (args.isNotEmpty) {
+   for (var arg in args) {
+    if (arg.startsWith('--no-lock')) {
+      _setLock = false;
+    }
+    if (arg.startsWith('--db-path=') || arg.startsWith('-db-path=')) {
+      final equalSignIndex = arg.indexOf('=');
+      if (equalSignIndex != -1 && equalSignIndex < arg.length - 1) {
+        _dbPathArg = arg.substring(equalSignIndex + 1);
+      }
+    }
+   }
   }
 }

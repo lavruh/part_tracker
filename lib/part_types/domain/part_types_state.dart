@@ -5,7 +5,7 @@ import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class PartTypesState extends GetxController {
   final types = <UniqueId, PartType>{}.obs;
-  final IDbService db = Get.find();
+  final IDbService db = Get.find<IDbService>();
   final _tableName = 'part_types';
   final _editMode = false.obs;
 

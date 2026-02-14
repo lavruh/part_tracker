@@ -226,27 +226,36 @@ class LocationManagerState extends GetxController {
     }
     Location? source;
     RunningHours? rhSpendOnLocation;
+    String? doneMaintenanceRemarks;
     if (sourceLocation != null) {
       source = locations[sourceLocation];
-      if (source != null) {
-        final sourceRhUpdateDate = source.runningHours?.date;
-        if (sourceRhUpdateDate != null) {
-          final n = DateTime.now();
-          if (sourceRhUpdateDate.millisecondsSinceEpoch <
-              DateTime(n.year, n.month, n.day).millisecondsSinceEpoch) {
-            throw LocationManagerException('Running hours are not up to date');
-          }
-        }
-        List<UniqueId> tmp = source.parts;
-        tmp.removeWhere((e) => e.id == partId.id);
-        updateLocation(source.copyWith(parts: tmp));
-        rhSpendOnLocation = partsManager.clearPartCurrentRunningHours(
-          partId,
-          installationRunningHours: target.runningHours,
-        );
+      if (source == null) {
+        throw LocationManagerException(
+            'Source location id: [$sourceLocation] not found');
       }
+      final sourceRhUpdateDate = source.runningHours?.date;
+      if (sourceRhUpdateDate != null) {
+        final n = DateTime.now();
+        if (sourceRhUpdateDate.millisecondsSinceEpoch <
+            DateTime(n.year, n.month, n.day).millisecondsSinceEpoch) {
+          throw LocationManagerException('Running hours are not up to date');
+        }
+      }
+      final sourceRunningHours = source.runningHours;
+      List<UniqueId> tmp = source.parts;
+      tmp.removeWhere((e) => e.id == partId.id);
+      updateLocation(source.copyWith(parts: tmp));
+      if (sourceRunningHours != null) {
+        doneMaintenanceRemarks = partsManager.performMaintenance(
+        partId: partId,
+        runningHours: sourceRunningHours,
+      );
+      }
+      rhSpendOnLocation = partsManager.clearPartCurrentRunningHours(
+        partId,
+        installationRunningHours: target.runningHours,
+      );
     }
-
     final updatedPart = partsManager.getPartWithIds([partId]).first;
 
     List<UniqueId> tmp = target.parts;
@@ -257,6 +266,7 @@ class LocationManagerState extends GetxController {
       target: target,
       source: source,
       runningHoursSpentOnLocation: rhSpendOnLocation,
+      extraRemarks: doneMaintenanceRemarks,
     );
   }
 
