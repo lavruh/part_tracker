@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:part_tracker/utils/domain/date_extensions.dart';
 
 class RunningHours {
   final int value;
@@ -23,7 +24,7 @@ class RunningHours {
   Map<String, dynamic> toMap() {
     return {
       'value': value,
-      'date': date.millisecondsSinceEpoch,
+      'date': date.toIso8601String(),
     };
   }
 
@@ -41,9 +42,11 @@ class RunningHours {
     if(map == null){
       return RunningHours(0);
     }
+    final dateMap = map['date'];
+
     return RunningHours._constructor(
       value: map['value'] as int,
-      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
+      date: fromDynamic(dateMap),
     );
   }
 

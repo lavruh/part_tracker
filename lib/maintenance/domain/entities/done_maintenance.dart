@@ -1,4 +1,5 @@
 import 'package:part_tracker/running_hours/domain/entities/running_hours.dart';
+import 'package:part_tracker/utils/domain/date_extensions.dart';
 import 'package:part_tracker/utils/domain/unique_id.dart';
 
 class DoneMaintenance {
@@ -20,7 +21,7 @@ class DoneMaintenance {
 
   Map<String, dynamic> toMap() {
     return {
-      'date': date.millisecondsSinceEpoch,
+      'date': date.toIso8601String(),
       'runningHours': runningHours.toMap(),
       'planId': planId.toMap(),
       'remarks': remarks,
@@ -28,8 +29,9 @@ class DoneMaintenance {
   }
 
   factory DoneMaintenance.fromMap(Map<String, dynamic> map) {
+    final dateMap = map['date'];
     return DoneMaintenance(
-      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
+      date: fromDynamic(dateMap),
       runningHours: RunningHours.fromMap(map['runningHours']),
       planId: UniqueId.fromMap(map['planId']),
       remarks: map['remarks'] ?? '',

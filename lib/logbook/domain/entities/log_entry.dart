@@ -1,4 +1,5 @@
 import 'package:part_tracker/utils/domain/unique_id.dart';
+import 'package:part_tracker/utils/domain/date_extensions.dart';
 
 class LogEntry {
   final UniqueId id;
@@ -36,7 +37,7 @@ class LogEntry {
   Map<String, dynamic> toMap() {
     return {
       'id': id.toString(),
-      'date': date.millisecondsSinceEpoch,
+      'date': date.toIso8601String(),
       'message': entry,
       'relatedParts': relatedParts.map((e) => e.toMap()).toList(),
       'relatedLocations': relatedLocations.map((e) => e.toMap()).toList(),
@@ -47,13 +48,15 @@ class LogEntry {
   factory LogEntry.fromMap(Map<String, dynamic> map) {
     List<String> attachments = [];
     if (map['attachments'] != null) {
-      attachments = (map['attachments'] as List).map((e) => e.toString()).toList();
+      attachments =
+          (map['attachments'] as List).map((e) => e.toString()).toList();
     }
+
+    final dateMap = map['date'];
 
     return LogEntry._internal(
       id: UniqueId(id: map['id']),
-      date: DateTime.fromMillisecondsSinceEpoch(
-          map['date'] ?? DateTime.now().millisecondsSinceEpoch),
+      date: fromDynamic(dateMap),
       entry: map['message'].toString(),
       relatedParts: (map['relatedParts'] as List)
           .map((e) => UniqueId.fromMap(e))
